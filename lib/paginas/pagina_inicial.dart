@@ -19,42 +19,95 @@ class PantallaInicial extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Logo en la izquierda
+                // Menú en la izquierda
+                Builder(
+                  builder: (BuildContext context) {
+                    return IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer(); // Abre el Drawer
+                      },
+                    );
+                  },
+                ),
+                // Título centrado
+                const Text(
+                  'Pedidos Pendientes',
+                  style: TextStyle(
+                    color: Colors.white, // Texto blanco
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                // Logo en la derecha
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.white,
-                        width: 2), // Borde blanco alrededor
+                    border: Border.all(color: Colors.white, width: 2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Image.asset(
-                    'assets/img/logo.jpg',
+                    'assets/img/logo.jpg', // Ruta de la imagen del logo
                     width: 50,
-                    height: 50,
+                    height: 45,
                   ),
-                ),
-                // Título centrado
-                const Flexible(
-                  child: Text(
-                    'Pedidos Pendientes',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white, // Texto blanco
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-                // Menú en la derecha
-                IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                  onPressed: () {
-                    // Acción del menú
-                  },
                 ),
               ],
             ),
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.black,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 3),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Image.asset(
+                      'assets/img/logo.jpg', // Ruta de la imagen del logo
+                      fit: BoxFit.scaleDown,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Menú Principal',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Inicio'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.fastfood),
+              title: const Text('Gestión de Platos'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/gestion_platos');
+              },
+            ),
+          ],
         ),
       ),
       body: Container(
@@ -74,11 +127,11 @@ class PantallaInicial extends StatelessWidget {
                     labelText: 'Buscar pedido por cliente',
                     labelStyle: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[600], // Texto gris suave
+                      color: Colors.grey[600],
                     ),
                     floatingLabelStyle: const TextStyle(
                       fontSize: 16,
-                      color: Colors.black, // Texto flotante negro
+                      color: Colors.black,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -86,23 +139,19 @@ class PantallaInicial extends StatelessWidget {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                          color: Colors
-                              .grey), // Borde gris cuando no está enfocado
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                          color: Colors.black), // Borde negro al enfocar
+                      borderSide: const BorderSide(color: Colors.black),
                     ),
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.grey[600], // Ícono gris suave
+                      color: Colors.grey[600],
                     ),
                   ),
                   style: const TextStyle(
-                    backgroundColor:
-                        Colors.transparent, // Prevenir cambio del fondo
+                    backgroundColor: Colors.transparent,
                   ),
                   onChanged: (value) {
                     // Lógica de búsqueda
@@ -113,7 +162,7 @@ class PantallaInicial extends StatelessWidget {
               // Listado de pedidos
               Expanded(
                 child: ListView.builder(
-                  itemCount: 10, // Reemplazar con el tamaño real de la lista
+                  itemCount: 10, // Número de pedidos
                   itemBuilder: (context, index) {
                     return Card(
                       margin: const EdgeInsets.symmetric(
@@ -123,7 +172,7 @@ class PantallaInicial extends StatelessWidget {
                       ),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: greenColor, // Azul suave
+                          backgroundColor: greenColor,
                           child: Text(
                             '#${index + 1}',
                             style: const TextStyle(color: Colors.white),

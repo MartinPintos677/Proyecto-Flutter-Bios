@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:formulario_basico/paginas/pagina_inicial.dart'; // Import PantallaInicial directamente por ahora
+import 'package:formulario_basico/paginas/pagina_inicial.dart';
+import 'package:formulario_basico/paginas/gestion_platos.dart'; // Nueva página
 
 void main() {
   runApp(const Aplicacion());
@@ -14,32 +15,28 @@ class Aplicacion extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Gestión de Pedidos',
       theme: ThemeData(
-        primaryColor: Colors.black, // Color global para encabezados
-        scaffoldBackgroundColor: Colors.grey[100], // Fondo general
+        primaryColor: Colors.black,
+        scaffoldBackgroundColor: Colors.grey[100],
         textTheme: const TextTheme(
           titleLarge:
               TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
           bodyMedium: TextStyle(color: Colors.grey, fontSize: 14),
         ),
-        cardTheme: CardTheme(
-          color: Colors.white,
-          shadowColor: Colors.grey[300],
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black, // Encabezado negro
-          foregroundColor: Colors.white, // Texto blanco
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
           elevation: 0,
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color.fromARGB(255, 44, 164, 50),
-          foregroundColor: Colors.white, // Ícono blanco // FAB verde
+          foregroundColor: Colors.white,
         ),
       ),
-      home: const PantallaInicial(), // Pantalla inicial configurada
+      initialRoute: '/', // Ruta inicial
+      routes: {
+        '/': (context) => const PantallaInicial(),
+        '/gestion_platos': (context) => const PantallaGestionPlatos(),
+      },
     );
   }
 }
