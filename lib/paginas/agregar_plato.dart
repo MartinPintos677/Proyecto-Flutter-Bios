@@ -116,6 +116,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Campo para el nombre del plato
               TextField(
                 controller: _nombreController,
                 decoration: InputDecoration(
@@ -126,6 +127,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                 ),
               ),
               const SizedBox(height: 15),
+              // Campo para el precio
               TextField(
                 controller: _precioController,
                 decoration: InputDecoration(
@@ -137,12 +139,17 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 15),
+              // Selector de foto
               Row(
                 children: [
                   ElevatedButton.icon(
                     onPressed: _elegirFoto,
                     icon: const Icon(Icons.photo_camera),
                     label: const Text('Elegir Foto'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 44, 164, 50),
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   _fotoPath != null
@@ -157,6 +164,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                 ],
               ),
               const SizedBox(height: 15),
+              // Título para los días
               const Text(
                 'Días Disponibles:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -173,15 +181,17 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                         _diasSeleccionados[index] = value!;
                       });
                     },
+                    activeColor: const Color.fromARGB(255, 44, 164, 50),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 20),
+              // Botón para guardar
               Center(
                 child: ElevatedButton(
                   onPressed: _guardarPlato,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: const Color.fromARGB(255, 44, 164, 50),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Guardar Plato'),
