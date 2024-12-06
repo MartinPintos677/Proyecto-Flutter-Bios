@@ -97,7 +97,7 @@ class PantallaGestionPlatos extends StatelessWidget {
                   icon: const Icon(Icons.filter_list),
                   label: const Text('Disponibles Hoy'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: const Color.fromARGB(255, 44, 164, 50),
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -117,8 +117,9 @@ class PantallaGestionPlatos extends StatelessWidget {
                     ),
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundColor:
-                            plato['disponible'] ? Colors.green : Colors.red,
+                        backgroundColor: plato['disponible']
+                            ? const Color.fromARGB(255, 44, 164, 50)
+                            : Colors.red,
                         child: Icon(
                           plato['disponible']
                               ? Icons.check
@@ -163,7 +164,7 @@ class PantallaGestionPlatos extends StatelessWidget {
           Navigator.pushNamed(
               context, '/agregar_plato'); // Navegar a agregar plato
         },
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 44, 164, 50),
         child: const Icon(Icons.add),
         tooltip: 'Agregar Plato',
       ),
