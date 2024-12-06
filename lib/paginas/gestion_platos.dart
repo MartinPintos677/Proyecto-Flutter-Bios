@@ -14,15 +14,55 @@ class PantallaGestionPlatos extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Gestión de Platos',
-          style: TextStyle(
-            fontSize: 20, // Tamaño de fuente 20
-            fontWeight: FontWeight.bold, // Opcional: Para hacerlo más destacado
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80), // Altura personalizada
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: primaryColor, // Fondo negro
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Botón de retroceso
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context); // Vuelve a la página anterior
+                  },
+                ),
+                // Título centrado
+                const Text(
+                  'Gestión de Platos',
+                  style: TextStyle(
+                    color: Colors.white, // Texto blanco
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                // Logo en la derecha con cursor "dedito"
+                MouseRegion(
+                  cursor: SystemMouseCursors.click, // Cursor dedito
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/'); // Redirige a inicio
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        'assets/img/logo.jpg',
+                        width: 50,
+                        height: 45,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        backgroundColor: primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -58,7 +98,7 @@ class PantallaGestionPlatos extends StatelessWidget {
                   label: const Text('Disponibles Hoy'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
-                    foregroundColor: Colors.white, // Fondo verde
+                    foregroundColor: Colors.white,
                   ),
                 ),
               ],
@@ -120,7 +160,8 @@ class PantallaGestionPlatos extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Acción para agregar un nuevo plato
+          Navigator.pushNamed(
+              context, '/agregar_plato'); // Navegar a agregar plato
         },
         backgroundColor: Colors.green,
         child: const Icon(Icons.add),
