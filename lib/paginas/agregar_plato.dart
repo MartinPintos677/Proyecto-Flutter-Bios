@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PantallaAgregarPlato extends StatefulWidget {
   const PantallaAgregarPlato({super.key});
@@ -24,11 +25,20 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     'Domingo',
   ];
 
-  void _elegirFoto() async {
-    final String? ruta = "ruta/foto/ejemplo.jpg"; // Reemplazar con la ruta real
-    setState(() {
-      _fotoPath = ruta;
-    });
+  final ImagePicker _picker =
+      ImagePicker(); // Crear una instancia de ImagePicker
+
+  // Función para elegir foto desde la galería o la cámara
+  Future<void> _elegirFoto() async {
+    final XFile? foto = await _picker.pickImage(
+      source: ImageSource.gallery, // Puedes usar cámara con ImageSource.camera
+    );
+
+    if (foto != null) {
+      setState(() {
+        _fotoPath = foto.path; // Guardar la ruta de la foto seleccionada
+      });
+    }
   }
 
   void _guardarPlato() {

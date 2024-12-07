@@ -140,7 +140,7 @@ class PantallaGestionPlatos extends StatelessWidget {
                             onPressed: () {
                               // Lógica para editar el plato
 
-                              print('Editar cliente: ${plato['nombre']}');
+                              print('Editar platos: ${plato['nombre']}');
                             },
                           ),
                           IconButton(
