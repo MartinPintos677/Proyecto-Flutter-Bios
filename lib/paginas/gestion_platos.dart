@@ -132,22 +132,24 @@ class PantallaGestionPlatos extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text('Precio: \$${plato['precio']}'),
-                      trailing: PopupMenuButton(
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            // Lógica para editar el plato
-                          } else if (value == 'delete') {
-                            // Lógica para eliminar el plato
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Editar'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min, // Minimiza el tamaño
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.black),
+                            onPressed: () {
+                              // Lógica para editar el plato
+
+                              print('Editar cliente: ${plato['nombre']}');
+                            },
                           ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Eliminar'),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.black),
+                            onPressed: () {
+                              // Lógica para eliminar el plato
+
+                              print('Eliminar plato: ${plato['nombre']}');
+                            },
                           ),
                         ],
                       ),

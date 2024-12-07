@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PantallaGestionClientes extends StatelessWidget {
@@ -126,22 +125,24 @@ class PantallaGestionClientes extends StatelessWidget {
                           Text('Teléfono: ${cliente['telefono']}'),
                         ],
                       ),
-                      trailing: PopupMenuButton(
-                        onSelected: (value) {
-                          if (value == 'edit') {
-                            // Lógica para editar el cliente
-                          } else if (value == 'delete') {
-                            // Lógica para eliminar el cliente
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Editar'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min, // Minimiza el tamaño
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.black),
+                            onPressed: () {
+                              // Lógica para editar el cliente
+
+                              print('Editar cliente: ${cliente['nombre']}');
+                            },
                           ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Eliminar'),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.black),
+                            onPressed: () {
+                              // Lógica para eliminar el cliente
+
+                              print('Eliminar cliente: ${cliente['nombre']}');
+                            },
                           ),
                         ],
                       ),
