@@ -31,7 +31,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
   // Función para elegir foto desde la galería o la cámara
   Future<void> _elegirFoto() async {
     final XFile? foto = await _picker.pickImage(
-      source: ImageSource.gallery, // Puedes usar cámara con ImageSource.camera
+      source: ImageSource.gallery,
     );
 
     if (foto != null) {
