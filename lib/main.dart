@@ -36,6 +36,7 @@ class Aplicacion extends StatelessWidget {
         '/': (context) => const PantallaInicial(),
         '/gestion_platos': (context) => const PantallaGestionPlatos(),
         '/agregar_plato': (context) => const PantallaAgregarPlato(),
+        '/gestion_clientes': (context) => const PantallaGestionClientes(),
       },
     );
   }

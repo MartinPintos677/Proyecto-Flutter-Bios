@@ -107,6 +107,14 @@ class PantallaInicial extends StatelessWidget {
                 Navigator.pushNamed(context, '/gestion_platos');
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.fastfood),
+              title: const Text('Gestión de Clientes'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/gestion_clientes');
+              },
+            ),
           ],
         ),
       ),
