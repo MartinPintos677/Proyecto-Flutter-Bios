@@ -108,7 +108,7 @@ class PantallaInicial extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.fastfood),
+              leading: const Icon(Icons.people),
               title: const Text('Gestión de Clientes'),
               onTap: () {
                 Navigator.pop(context);
