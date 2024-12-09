@@ -129,18 +129,31 @@ class PantallaGestionClientes extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min, // Minimiza el tamaño
                         children: [
                           IconButton(
+                            icon: const Icon(Icons.visibility,
+                                color: Colors.black),
+                            tooltip: 'Ver ficha',
+                            onPressed: () {
+                              // Navegar a la ficha del cliente
+                              Navigator.pushNamed(
+                                context,
+                                '/ficha_cliente',
+                                arguments: cliente,
+                              );
+                            },
+                          ),
+                          IconButton(
                             icon: const Icon(Icons.edit, color: Colors.black),
+                            tooltip: 'Editar',
                             onPressed: () {
                               // Lógica para editar el cliente
-
                               print('Editar cliente: ${cliente['nombre']}');
                             },
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.black),
+                            tooltip: 'Eliminar',
                             onPressed: () {
                               // Lógica para eliminar el cliente
-
                               print('Eliminar cliente: ${cliente['nombre']}');
                             },
                           ),

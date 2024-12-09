@@ -38,6 +38,7 @@ class Aplicacion extends StatelessWidget {
         '/agregar_plato': (context) => const PantallaAgregarPlato(),
         '/gestion_clientes': (context) => const PantallaGestionClientes(),
         '/agregar_cliente': (context) => const PantallaAgregarCliente(),
+        '/ficha_cliente': (context) => const PantallaFichaCliente(),
       },
     );
   }
