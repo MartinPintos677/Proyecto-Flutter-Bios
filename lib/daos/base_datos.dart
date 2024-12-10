@@ -34,7 +34,7 @@ class DatabaseHelper {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE Cliente (
-        cedula INTEGER PRIMARY KEY, 
+        cedula TEXT PRIMARY KEY, 
         nombre TEXT NOT NULL,
         telefonoContacto TEXT NOT NULL,
         direccionEntrega TEXT NOT NULL

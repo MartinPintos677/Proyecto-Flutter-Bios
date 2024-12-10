@@ -1,61 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/daos/dao_clientes.dart';
+import 'package:formulario_basico/dominio/clientes.dart';
 
-class PantallaGestionClientes extends StatelessWidget {
+class PantallaGestionClientes extends StatefulWidget {
   const PantallaGestionClientes({super.key});
 
   @override
+  State<PantallaGestionClientes> createState() =>
+      _PantallaGestionClientesState();
+}
+
+class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
+  final DaoClientes _daoClientes = DaoClientes();
+  List<Cliente> _clientes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarClientes();
+  }
+
+  // Método para cargar los clientes desde la base de datos
+  Future<void> _cargarClientes() async {
+    final clientes = await _daoClientes
+        .getClientes(); // Asegúrate de que getClientes() esté bien implementado
+    setState(() {
+      _clientes = clientes;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Colors.black; // Encabezado negro
-    final List<Map<String, dynamic>> clientes = [
-      {
-        'cedula': '12345678',
-        'nombre': 'Juan Pérez',
-        'direccion': 'Av. Libertador 123',
-        'telefono': '123456789'
-      },
-      {
-        'cedula': '87654321',
-        'nombre': 'Ana López',
-        'direccion': 'Calle Ficticia 456',
-        'telefono': '987654321'
-      },
-      {
-        'cedula': '11223344',
-        'nombre': 'Carlos García',
-        'direccion': 'Calle Real 789',
-        'telefono': '112233445'
-      },
-    ];
+    const Color primaryColor = Colors.black;
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80), // Altura personalizada
+        preferredSize: const Size.fromHeight(80),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: primaryColor, // Fondo negro
+          color: primaryColor,
           child: SafeArea(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Botón de retroceso
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.pop(context); // Vuelve a la página anterior
+                    Navigator.pop(context); // Volver a la página anterior
                   },
                 ),
-                // Título centrado
                 const Text(
                   'Gestión de Clientes',
                   style: TextStyle(
-                    color: Colors.white, // Texto blanco
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
-                // Logo en la derecha
                 MouseRegion(
-                  cursor: SystemMouseCursors.click, // Cursor dedito
+                  cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/'); // Redirige a inicio
@@ -99,78 +102,93 @@ class PantallaGestionClientes extends StatelessWidget {
                 // Lógica para filtrar la lista de clientes
               },
             ),
-
             const SizedBox(height: 10),
-            // Lista de clientes
+
+            // Mostrar clientes
             Expanded(
-              child: ListView.builder(
-                itemCount: clientes.length,
-                itemBuilder: (context, index) {
-                  final cliente = clientes[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              child: _clientes.isEmpty
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator()) // Mostrar cargando mientras se obtienen los datos
+                  : ListView.builder(
+                      itemCount: _clientes.length,
+                      itemBuilder: (context, index) {
+                        final cliente = _clientes[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              cliente.nombre,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Cédula: ${cliente.cedula}'),
+                                Text('Dirección: ${cliente.direccion}'),
+                                Text('Teléfono: ${cliente.telefono}'),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.visibility,
+                                      color: Colors.black),
+                                  tooltip: 'Ver ficha',
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/ficha_cliente',
+                                      arguments: cliente,
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.black),
+                                  tooltip: 'Editar',
+                                  onPressed: () {
+                                    // Lógica para editar el cliente
+                                    print('Editar cliente: ${cliente.nombre}');
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.black),
+                                  tooltip: 'Eliminar',
+                                  onPressed: () {
+                                    // Lógica para eliminar el cliente
+                                    print(
+                                        'Eliminar cliente: ${cliente.nombre}');
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    child: ListTile(
-                      title: Text(
-                        cliente['nombre'], // Mostramos el nombre del cliente
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Cédula: ${cliente['cedula']}'),
-                          Text('Dirección: ${cliente['direccion']}'),
-                          Text('Teléfono: ${cliente['telefono']}'),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min, // Minimiza el tamaño
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.visibility,
-                                color: Colors.black),
-                            tooltip: 'Ver ficha',
-                            onPressed: () {
-                              // Navegar a la ficha del cliente
-                              Navigator.pushNamed(
-                                context,
-                                '/ficha_cliente',
-                                arguments: cliente,
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.black),
-                            tooltip: 'Editar',
-                            onPressed: () {
-                              // Lógica para editar el cliente
-                              print('Editar cliente: ${cliente['nombre']}');
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.black),
-                            tooltip: 'Eliminar',
-                            onPressed: () {
-                              // Lógica para eliminar el cliente
-                              print('Eliminar cliente: ${cliente['nombre']}');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(
-              context, '/agregar_cliente'); // Navegar a agregar cliente
+        onPressed: () async {
+          // Navegar a agregar cliente
+          final resultado = await Navigator.pushNamed(
+            context,
+            '/agregar_cliente',
+          );
+
+          // Si el resultado es verdadero, recargar los clientes
+          if (resultado == true) {
+            _cargarClientes();
+          }
         },
         backgroundColor: const Color.fromARGB(255, 44, 164, 50),
         child: const Icon(Icons.add),

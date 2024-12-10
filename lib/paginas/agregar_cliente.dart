@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/daos/dao_clientes.dart';
+import 'package:formulario_basico/dominio/clientes.dart';
 
 class PantallaAgregarCliente extends StatefulWidget {
   const PantallaAgregarCliente({super.key});
@@ -13,7 +15,9 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
 
-  void _guardarCliente() {
+  final DaoClientes _daoClientes = DaoClientes();
+
+  Future<void> _guardarCliente() async {
     final cedula = _cedulaController.text.trim();
     final nombre = _nombreController.text.trim();
     final direccion = _direccionController.text.trim();
@@ -31,14 +35,32 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
       return;
     }
 
-    // Lógica para guardar el cliente
-    print('Cédula: $cedula');
-    print('Nombre: $nombre');
-    print('Dirección: $direccion');
-    print('Teléfono: $telefono');
+    // Crear el cliente
+    final cliente = Cliente(
+      cedula: cedula,
+      nombre: nombre,
+      direccion: direccion,
+      telefono: telefono,
+    );
 
-    // Volver a la pantalla anterior
-    Navigator.pop(context);
+    // Guardar el cliente en la base de datos
+    try {
+      await _daoClientes.insertCliente(cliente);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cliente guardado correctamente'),
+        ),
+      );
+
+      // Volver a la pantalla anterior y pasar el valor true
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al guardar cliente: $e'),
+        ),
+      );
+    }
   }
 
   @override
