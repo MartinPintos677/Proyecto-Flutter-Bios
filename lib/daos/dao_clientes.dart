@@ -11,9 +11,6 @@ class DaoClientes {
     return _instancia;
   }
 
-
-  final BaseDatos _dbHelper = BaseDatos.instance;
-
   // Crear un cliente
   Future<int> insertCliente(Cliente cliente) async {
     Database db = await BaseDatos().obtenerBaseDatos();

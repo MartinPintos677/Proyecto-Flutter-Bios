@@ -10,57 +10,27 @@ class PantallaAgregarCliente extends StatefulWidget {
 }
 
 class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
-  final TextEditingController _cedulaController = TextEditingController();
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _direccionController = TextEditingController();
-  final TextEditingController _telefonoController = TextEditingController();
 
-  final DaoClientes _daoClientes = DaoClientes();
+  final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
 
-  Future<void> _guardarCliente() async {
-    final cedula = _cedulaController.text.trim();
-    final nombre = _nombreController.text.trim();
-    final direccion = _direccionController.text.trim();
-    final telefono = _telefonoController.text.trim();
+  Cliente? _cliente;
+  late String? _cedula;
+  late String? _nombre;
+  late String? _direccion;
+  late String? _telefono;
 
-    if (cedula.isEmpty ||
-        nombre.isEmpty ||
-        direccion.isEmpty ||
-        telefono.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, completa todos los campos obligatorios'),
-        ),
-      );
-      return;
-    }
 
-    // Crear el cliente
-    final cliente = Cliente(
-      cedula: cedula,
-      nombre: nombre,
-      direccion: direccion,
-      telefono: telefono,
-    );
 
-    // Guardar el cliente en la base de datos
-    try {
-      await _daoClientes.insertCliente(cliente);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cliente guardado correctamente'),
-        ),
-      );
-
-      // Volver a la pantalla anterior y pasar el valor true
-      Navigator.pop(context, true);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al guardar cliente: $e'),
-        ),
-      );
-    }
+  @override
+  void didChangeDependencies() { //Esta se ejecuta inmedietamente despues del initState
+    _cliente = ModalRoute.of(context)?.settings.arguments as Cliente?; //Si al final todo es null, significa que estamos en un agregar
+    
+    _cedula = _cliente?.cedula;
+    _nombre = _cliente?.nombre;
+    _direccion = _cliente?.direccion;
+    _telefono = _cliente?.telefono;
+    
+    super.didChangeDependencies();
   }
 
   @override
@@ -118,71 +88,160 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Campo para la cédula
-              TextField(
-                controller: _cedulaController,
-                decoration: InputDecoration(
-                  labelText: 'Cédula',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
+        child: Scrollbar(
+          child: SingleChildScrollView(
+            child: Form(
+              key: _claveFormulario,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Campo para la cédula
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Cédula',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    initialValue: _cedula,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if(value == null || value.isEmpty){
+                            return 'La cédula no debe quedar vacía';
+                          }
 
-              // Campo para el nombre
-              TextField(
-                controller: _nombreController,
-                decoration: InputDecoration(
-                  labelText: 'Nombre',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                          if(value.length > 8 && value.length < 8){
+                            return 'La cédula debe tener 8 caracteres exactos';
+                          }
+                          return null; //Todo Ok
+                    },
+                    onSaved: (newValue) {
+                          _cedula = newValue!;
+                        },
                   ),
-                ),
-              ),
-              const SizedBox(height: 15),
+                  const SizedBox(height: 15),
+                        
+                  // Campo para el nombre
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Nombre',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    initialValue: _nombre,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if(value == null || value.isEmpty){
+                            return 'El nombre no debe quedar vacío';
+                          }
 
-              // Campo para la dirección
-              TextField(
-                controller: _direccionController,
-                decoration: InputDecoration(
-                  labelText: 'Dirección',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                          if(value.length > 100){
+                            return 'El nombre no debe tener más de 100 caracteres';
+                          }
+                          return null; //Todo Ok
+                    },
+                    onSaved: (newValue) {
+                          _nombre = newValue!;
+                        },
                   ),
-                ),
-              ),
-              const SizedBox(height: 15),
+                  const SizedBox(height: 15),
+                        
+                  // Campo para la dirección
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Dirección',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    initialValue: _direccion,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if(value == null || value.isEmpty){
+                            return 'La dirección no debe quedar vacía';
+                          }
 
-              // Campo para el teléfono
-              TextField(
-                controller: _telefonoController,
-                decoration: InputDecoration(
-                  labelText: 'Teléfono',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                          if(value.length > 100){
+                            return 'La dirección no debe tener más de 100 caracteres';
+                          }
+                          return null; //Todo Ok
+                    },
+                    onSaved: (newValue) {
+                          _direccion = newValue!;
+                        },
                   ),
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 15),
+                        
+                  // Campo para el teléfono
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Teléfono',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    initialValue: _telefono,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if(value == null || value.isEmpty){
+                            return 'El telefono no debe quedar vacío';
+                          }
+                          return null; //Todo Ok
+                    },
+                    onSaved: (newValue) {
+                          _telefono = newValue!;
+                        },
+                  ),
+                  const SizedBox(height: 20),
+                        
+                  // Botón para guardar
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if(_claveFormulario.currentState?.validate() ?? false){
+                            _claveFormulario.currentState?.save();
 
-              // Botón para guardar
-              Center(
-                child: ElevatedButton(
-                  onPressed: _guardarCliente,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 44, 164, 50),
-                    foregroundColor: Colors.white,
+                            String mensaje;
+
+                            try {
+                              if(_cliente == null){
+                                await DaoClientes().insertCliente(Cliente(cedula: _cedula!, nombre: _nombre!, direccion: _direccion!, telefono: _telefono!));
+
+                              }else{
+                                await DaoClientes().updateCliente(Cliente(cedula: _cedula!, nombre: _nombre!, direccion: _direccion!, telefono: _telefono!));
+                              }
+
+                              mensaje = 'Cliente ${_cliente == null ? 'Agregado' : 'Modificado'} con éxito';
+
+                              if(context.mounted) Navigator.of(context).pop(true);
+                            } on Exception catch (e) {
+                              mensaje = 'Error ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
+                            }
+
+                            if(context.mounted){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(mensaje, textAlign: TextAlign.center,),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: const Color.fromARGB(128, 64, 64, 64),
+                                  shape:  const StadiumBorder(),
+                                  duration:  const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 44, 164, 50),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Guardar Cliente'),
+                    ),
                   ),
-                  child: const Text('Guardar Cliente'),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

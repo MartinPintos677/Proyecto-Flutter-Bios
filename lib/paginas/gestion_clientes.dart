@@ -152,20 +152,19 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                                   icon: const Icon(Icons.edit,
                                       color: Colors.black),
                                   tooltip: 'Editar',
-                                  onPressed: () {
-                                    // Lógica para editar el cliente
-                                    print('Editar cliente: ${cliente.nombre}');
+                                  onPressed: () async{
+                                    final resultado = await Navigator.pushNamed(context,'/agregar_cliente',arguments: cliente,);
+
+                                    if (resultado == true) {
+                                      _cargarClientes();
+                                    }
                                   },
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   tooltip: 'Eliminar',
-                                  onPressed: () {
-                                    // Lógica para eliminar el cliente
-                                    print(
-                                        'Eliminar cliente: ${cliente.nombre}');
-                                  },
+                                  onPressed: () => mostrarConfirmarEliminar(context, cliente),
                                 ),
                               ],
                             ),
@@ -193,6 +192,52 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
         backgroundColor: const Color.fromARGB(255, 44, 164, 50),
         child: const Icon(Icons.add),
         tooltip: 'Agregar Cliente',
+      ),
+    );
+  }
+
+  void mostrarConfirmarEliminar(BuildContext context, Cliente cliente){
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Eliminar Cliente"),
+        content: Text("Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              String mensaje;
+              try{
+                await DaoClientes().deleteCliente(cliente.cedula);
+
+                mensaje = "Cliente eliminado con éxito";
+
+                _cargarClientes();
+              } on Exception catch (e) {
+                mensaje = 'Error ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
+              }
+
+              if(context.mounted){
+                Navigator.of(context).pop();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(mensaje, textAlign: TextAlign.center,),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: const Color.fromARGB(128, 64, 64, 64),
+                    shape:  const StadiumBorder(),
+                    duration:  const Duration(seconds: 2),
+                  ),
+                );
+              }
+            } ,
+            child: const Text("Si"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("No"),
+          ),
+        ],
       ),
     );
   }
