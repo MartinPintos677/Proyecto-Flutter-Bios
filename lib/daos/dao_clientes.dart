@@ -3,17 +3,26 @@ import 'package:sqflite/sqflite.dart';
 import 'package:formulario_basico/dominio/clientes.dart';
 
 class DaoClientes {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  static final DaoClientes _instancia = DaoClientes._inicializar();
+
+  DaoClientes._inicializar();
+
+  factory DaoClientes(){
+    return _instancia;
+  }
+
+
+  final BaseDatos _dbHelper = BaseDatos.instance;
 
   // Crear un cliente
   Future<int> insertCliente(Cliente cliente) async {
-    Database db = await _dbHelper.database;
+    Database db = await BaseDatos().obtenerBaseDatos();
     return await db.insert('Cliente', cliente.toMap());
   }
 
   // Obtener todos los clientes
   Future<List<Cliente>> getClientes() async {
-    Database db = await _dbHelper.database;
+    Database db = await BaseDatos().obtenerBaseDatos();
     List<Map<String, dynamic>> clientMaps = await db.query('Cliente');
 
     return List.generate(clientMaps.length, (i) {
@@ -23,7 +32,7 @@ class DaoClientes {
 
   // Obtener un cliente por su cédula
   Future<Cliente?> getClienteByCedula(String cedula) async {
-    Database db = await _dbHelper.database;
+    Database db = await BaseDatos().obtenerBaseDatos();
     List<Map<String, dynamic>> clientMaps = await db.query(
       'Cliente',
       where: 'cedula = ?',
@@ -38,7 +47,7 @@ class DaoClientes {
 
   // Modificar un cliente
   Future<int> updateCliente(Cliente cliente) async {
-    Database db = await _dbHelper.database;
+    Database db = await BaseDatos().obtenerBaseDatos();
     return await db.update(
       'Cliente',
       cliente.toMap(),
@@ -49,7 +58,7 @@ class DaoClientes {
 
   // Eliminar un cliente
   Future<int> deleteCliente(String cedula) async {
-    Database db = await _dbHelper.database;
+    Database db = await BaseDatos().obtenerBaseDatos();
     return await db.delete(
       'Cliente',
       where: 'cedula = ?',

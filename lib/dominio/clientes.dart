@@ -26,8 +26,8 @@ class Cliente {
     return Cliente(
       cedula: map['cedula'],
       nombre: map['nombre'],
-      direccion: map['direccion'],
-      telefono: map['telefono'],
+      direccion: map['direccionEntrega'],
+      telefono: map['telefonoContacto'],
     );
   }
 }
