@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class BaseDatos {
-
   static Database? _database;
 
   // Singleton: Instancia única de la base de datos
@@ -12,14 +11,16 @@ class BaseDatos {
 
   BaseDatos._inicializar();
 
-  factory BaseDatos(){ //El constructor es sin nombre, por defecto
+  factory BaseDatos() {
+    //El constructor es sin nombre, por defecto
     return instance;
   }
 
-  Future<Database> obtenerBaseDatos() async{
-    if(_baseDeDatos != null) return _baseDeDatos!;
+  Future<Database> obtenerBaseDatos() async {
+    if (_baseDeDatos != null) return _baseDeDatos!;
 
-    final String rutasDirectoriosBDs = await getDatabasesPath();//Tenemos la ruta absoluta de el directorio deonde estaría la BD
+    final String rutasDirectoriosBDs =
+        await getDatabasesPath(); //Tenemos la ruta absoluta de el directorio deonde estaría la BD
     final String rutaArchivoBD = join(rutasDirectoriosBDs, "bios_lunch.sqlite");
 
     _baseDeDatos = await openDatabase(
@@ -38,7 +39,7 @@ class BaseDatos {
         await db.execute('''
           CREATE TABLE Pedido (
             idPedido INTEGER PRIMARY KEY AUTOINCREMENT,
-            cedula INTEGER,
+            cedula TEXT,
             cobrado BOOLEAN NOT NULL,
             fechaHoraRealizacion DATETIME NOT NULL,
             observaciones TEXT,
@@ -73,16 +74,16 @@ class BaseDatos {
       onOpen: (db) {
         //En SQLite, las reestricciones foraneas estan deshabilitadas de manera predeterminada por cuestiones de retrocompatibilidad
         //Para habilitarla en la conexion actual:
-        db.execute('PRAGMA foreign_keys = ON;'); //Solo se ejecuta cuando abrimos la bd por primera vez porque esta en el onOpen
+        db.execute(
+            'PRAGMA foreign_keys = ON;'); //Solo se ejecuta cuando abrimos la bd por primera vez porque esta en el onOpen
       },
     );
-    
 
     return _baseDeDatos!;
   }
 
-  Future<void> cerrarBaseDatos() async{
-    await _baseDeDatos?.close();//Si no es nulo
+  Future<void> cerrarBaseDatos() async {
+    await _baseDeDatos?.close(); //Si no es nulo
 
     _baseDeDatos = null;
   }

@@ -22,8 +22,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
 
   // Método para cargar los clientes desde la base de datos
   Future<void> _cargarClientes() async {
-    final clientes = await _daoClientes
-        .getClientes(); // Asegúrate de que getClientes() esté bien implementado
+    final clientes = await _daoClientes.getClientes();
     setState(() {
       _clientes = clientes;
     });
@@ -152,8 +151,12 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                                   icon: const Icon(Icons.edit,
                                       color: Colors.black),
                                   tooltip: 'Editar',
-                                  onPressed: () async{
-                                    final resultado = await Navigator.pushNamed(context,'/agregar_cliente',arguments: cliente,);
+                                  onPressed: () async {
+                                    final resultado = await Navigator.pushNamed(
+                                      context,
+                                      '/agregar_cliente',
+                                      arguments: cliente,
+                                    );
 
                                     if (resultado == true) {
                                       _cargarClientes();
@@ -164,7 +167,8 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                                   icon: const Icon(Icons.delete,
                                       color: Colors.black),
                                   tooltip: 'Eliminar',
-                                  onPressed: () => mostrarConfirmarEliminar(context, cliente),
+                                  onPressed: () => mostrarConfirmarEliminar(
+                                      context, cliente),
                                 ),
                               ],
                             ),
@@ -196,41 +200,46 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
     );
   }
 
-  void mostrarConfirmarEliminar(BuildContext context, Cliente cliente){
+  void mostrarConfirmarEliminar(BuildContext context, Cliente cliente) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Eliminar Cliente"),
-        content: Text("Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
+        content: Text(
+            "Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
         actions: [
           TextButton(
             onPressed: () async {
               String mensaje;
-              try{
+              try {
                 await DaoClientes().deleteCliente(cliente.cedula);
 
                 mensaje = "Cliente eliminado con éxito";
 
                 _cargarClientes();
               } on Exception catch (e) {
-                mensaje = 'Error ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
+                mensaje =
+                    'Error ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
               }
 
-              if(context.mounted){
+              if (context.mounted) {
                 Navigator.of(context).pop();
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(mensaje, textAlign: TextAlign.center,),
+                    content: Text(
+                      mensaje,
+                      textAlign: TextAlign.center,
+                    ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: const Color.fromARGB(128, 64, 64, 64),
-                    shape:  const StadiumBorder(),
-                    duration:  const Duration(seconds: 2),
+                    shape: const StadiumBorder(),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
-            } ,
+            },
             child: const Text("Si"),
           ),
           TextButton(
