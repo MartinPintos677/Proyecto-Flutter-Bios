@@ -195,6 +195,18 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
+                            icon: const Icon(Icons.visibility,
+                                color: Colors.black),
+                            tooltip: 'Ver ficha',
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/ficha_plato',
+                                arguments: plato,
+                              );
+                            },
+                          ),
+                          IconButton(
                             icon: const Icon(Icons.edit, color: Colors.black),
                             onPressed: () {
                               // Lógica para editar el plato
@@ -235,8 +247,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
 
                               // Si se confirma la eliminación, se elimina el plato
                               if (confirmDelete) {
-                                await _eliminarPlato(
-                                    plato.idPlato); // Llamar al método eliminar
+                                await _eliminarPlato(plato.idPlato);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Plato eliminado')),
