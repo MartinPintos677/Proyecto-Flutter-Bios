@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:formulario_basico/daos/dao_platos.dart';
 import 'package:formulario_basico/dominio/platos.dart';
+import 'package:formulario_basico/paginas/agregar_plato.dart';
 
 class PantallaGestionPlatos extends StatefulWidget {
   const PantallaGestionPlatos({super.key});
@@ -12,6 +13,7 @@ class PantallaGestionPlatos extends StatefulWidget {
 class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   final DaoPlato _daoPlato = DaoPlato();
   List<Plato> _platos = [];
+  List<Plato> _platosFiltrados = [];
 
   @override
   void initState() {
@@ -24,6 +26,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     final platos = await _daoPlato.obtenerPlatos();
     setState(() {
       _platos = platos;
+      _platosFiltrados = platos; // Inicialmente, mostrar todos los platos
     });
   }
 
@@ -36,8 +39,14 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   // Método para navegar a la pantalla de agregar plato
   void _agregarPlato(BuildContext context) async {
     // Esperamos el valor retornado de la pantalla de agregar plato
-    bool? result = await Navigator.pushNamed(context, '/agregar_plato');
+    final bool? result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              const PantallaAgregarPlato()), // Pantalla para agregar plato
+    );
 
+    // Verificamos el resultado devuelto (true o false)
     if (result == true) {
       // Si el resultado es true, significa que un plato fue agregado/actualizado
       _cargarPlatos(); // Recargar la lista después de agregar un plato
@@ -45,9 +54,29 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   }
 
   // Método para editar un plato
-  void _editarPlato(Plato plato) {
-    Navigator.pushNamed(context, '/agregar_plato', arguments: plato).then((_) {
-      _cargarPlatos(); // Recargar la lista después de editar
+  void _editarPlato(Plato plato) async {
+    // Navegar a la pantalla de agregar plato con el plato seleccionado
+    final bool? result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PantallaAgregarPlato(),
+        settings: RouteSettings(arguments: plato),
+      ),
+    );
+
+    // Recargar la lista después de editar
+    if (result == true) {
+      _cargarPlatos();
+    }
+  }
+
+  // Método para filtrar los platos por nombre
+  void _filtrarPlatos(String query) {
+    setState(() {
+      _platosFiltrados = _platos
+          .where((plato) =>
+              plato.nombre.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
@@ -105,6 +134,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
+            // Barra de búsqueda
             TextField(
               decoration: InputDecoration(
                 filled: true,
@@ -118,8 +148,8 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
               ),
               onChanged: (value) {
-                // Lógica para filtrar la lista de platos
-                // Esta parte podría ir aquí para filtrar según el texto ingresado
+                // Llamamos a la función de filtrado cada vez que cambia el texto
+                _filtrarPlatos(value);
               },
             ),
             const SizedBox(height: 10),
@@ -142,9 +172,9 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: _platos.length,
+                itemCount: _platosFiltrados.length,
                 itemBuilder: (context, index) {
-                  final plato = _platos[index];
+                  final plato = _platosFiltrados[index];
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 5),
                     shape: RoundedRectangleBorder(
@@ -180,34 +210,34 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.black),
                             onPressed: () async {
-                              // Lógica para eliminar el plato
                               bool confirmDelete = await showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Eliminar Plato'),
-                                    content: Text(
-                                      '¿Estás seguro de eliminar el plato "${plato.nombre}"?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(
-                                              context, false); // Cancelar
-                                        },
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(
-                                              context, true); // Confirmar
-                                        },
-                                        child: const Text('Eliminar'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('Eliminar Plato'),
+                                        content: Text(
+                                          '¿Estás seguro de eliminar el plato "${plato.nombre}"?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(
+                                                  false); // Cancela la eliminación
+                                            },
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(
+                                                  true); // Confirma la eliminación
+                                            },
+                                            child: const Text('Eliminar'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ) ??
+                                  false;
 
                               // Si se confirma la eliminación, se elimina el plato
                               if (confirmDelete) {
@@ -217,7 +247,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                                   SnackBar(content: Text('Plato eliminado')),
                                 );
                                 setState(() {
-                                  _platos.removeAt(
+                                  _platosFiltrados.removeAt(
                                       index); // Actualiza la lista de platos
                                 });
                               }

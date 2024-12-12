@@ -33,6 +33,23 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
   final ImagePicker _picker = ImagePicker();
 
   @override
+  void initState() {
+    super.initState();
+
+    // Si la variable _plato no es null, inicializa las variables con sus valores
+    if (_plato != null) {
+      _nombre = _plato!.nombre;
+      _precio = _plato!.precio;
+      _disponible = _plato!.activo;
+    } else {
+      // Si _plato es null, asigna valores predeterminados
+      _nombre = '';
+      _precio = 0.0;
+      _disponible = true;
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -51,6 +68,8 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
       _diasSeleccionados = List.generate(7, (index) {
         return diasDisponiblesList.contains(_diasSemana[index]);
       });
+      // Asignar la foto si existe
+      _fotoPath = _plato?.foto ?? ''; // Si hay foto, se asigna
     } else {
       // Si no hay plato (es para agregar uno nuevo), los días estarán todos desmarcados
       _diasSeleccionados = List.generate(7, (index) => false);
@@ -103,7 +122,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
       activo: _disponible,
       diasDisponibles:
           diasSeleccionadosString, // Guardar los días seleccionados como una cadena
-      foto: _fotoPath ?? '',
+      foto: _fotoPath ?? null, // Si no hay foto, lo dejamos como null
     );
 
     // Guardar o actualizar en la base de datos
@@ -111,12 +130,12 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     String mensaje;
     try {
       if (_plato == null) {
-        // Si es un plato nuevo
-        await daoPlato.insertarPlato(plato.toMap());
+        // Si es un plato nuevo, usamos toMap() para convertir el objeto Plato en un mapa
+        await daoPlato.agregarPlato(plato.toMap());
         mensaje = 'Plato agregado con éxito';
       } else {
-        // Si es un plato existente
-        await daoPlato.actualizarPlato(plato.toMap());
+        // Si es un plato existente, actualizamos el plato usando el objeto Plato directamente
+        await daoPlato.actualizarPlato(plato);
         mensaje = 'Plato actualizado con éxito';
       }
 

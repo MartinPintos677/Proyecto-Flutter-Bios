@@ -13,28 +13,28 @@ class DaoPlato {
   }
 
   // Crear un plato
-  Future<int> insertarPlato(Map<String, dynamic> plato) async {
+  Future<int> agregarPlato(Map<String, dynamic> plato) async {
     Database db = await BaseDatos().obtenerBaseDatos();
     return await db.insert('Plato', plato);
   }
 
   // Obtener todos los platos
   Future<List<Plato>> obtenerPlatos() async {
-    Database db = await BaseDatos().obtenerBaseDatos();
-    final List<Map<String, dynamic>> platosMap = await db.query('Plato');
-    return List.generate(platosMap.length, (i) {
-      return Plato.fromMap(platosMap[i]);
+    final db = await BaseDatos().obtenerBaseDatos();
+    final List<Map<String, dynamic>> maps = await db.query('Plato');
+    return List.generate(maps.length, (i) {
+      return Plato.fromMap(maps[i]);
     });
   }
 
   // Modificar un plato
-  Future<int> actualizarPlato(Map<String, dynamic> plato) async {
+  Future<int> actualizarPlato(Plato plato) async {
     Database db = await BaseDatos().obtenerBaseDatos();
     return await db.update(
       'Plato',
-      plato,
+      plato.toMap(),
       where: 'idPlato = ?',
-      whereArgs: [plato['idPlato']],
+      whereArgs: [plato.idPlato],
     );
   }
 
@@ -61,7 +61,9 @@ class DaoPlato {
 
     if (mapasPlato.isNotEmpty) {
       Map<String, Object?> mp = {...mapasPlato.first};
-      mp['cliente'] = (await DaoClientes().getClienteByCedula(mp['cedula'] as String))?.toMap();
+      mp['cliente'] =
+          (await DaoClientes().getClienteByCedula(mp['cedula'] as String))
+              ?.toMap();
 
       plato = Plato.fromMap(mp);
     }
