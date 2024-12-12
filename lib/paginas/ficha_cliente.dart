@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/dominio/clientes.dart';
 
 class PantallaFichaCliente extends StatelessWidget {
   const PantallaFichaCliente({super.key});
@@ -6,8 +7,7 @@ class PantallaFichaCliente extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Recibe los datos del cliente
-    final Map<String, dynamic> cliente =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    Cliente cliente = ModalRoute.of(context)!.settings.arguments as Cliente;
 
     final List<Map<String, dynamic>> pedidos = [
       {'id': 1, 'importe': 1500.0},
@@ -39,7 +39,7 @@ class PantallaFichaCliente extends StatelessWidget {
                   },
                 ),
                 Text(
-                  'Ficha de ${cliente['nombre']}',
+                  'Ficha de ${cliente}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

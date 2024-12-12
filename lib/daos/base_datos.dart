@@ -39,7 +39,7 @@ class BaseDatos {
         await db.execute('''
           CREATE TABLE Pedido (
             idPedido INTEGER PRIMARY KEY AUTOINCREMENT,
-            cedula TEXT,
+            cedula TEXT NOT NULL,
             cobrado BOOLEAN NOT NULL,
             fechaHoraRealizacion DATETIME NOT NULL,
             observaciones TEXT,
