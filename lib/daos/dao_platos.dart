@@ -18,10 +18,16 @@ class DaoPlato {
     return await db.insert('Plato', plato);
   }
 
-  // Obtener todos los platos
+  // // Obtener solo los platos activos
   Future<List<Plato>> obtenerPlatos() async {
     final db = await BaseDatos().obtenerBaseDatos();
-    final List<Map<String, dynamic>> maps = await db.query('Plato');
+    // Filtrar los platos activos
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Plato',
+      where: 'activo = 1',
+    );
+
+    // Convertir los resultados a objetos Plato
     return List.generate(maps.length, (i) {
       return Plato.fromMap(maps[i]);
     });
@@ -39,10 +45,12 @@ class DaoPlato {
   }
 
   // Eliminar un plato por su ID
-  Future<int> eliminarPlato(int idPlato) async {
+  Future<int> darBajaPlato(int idPlato) async {
     Database db = await BaseDatos().obtenerBaseDatos();
-    return await db.delete(
+    // Actualizamos el campo 'activo' a 0 (inactivo)
+    return await db.update(
       'Plato',
+      {'activo': 0}, // Establecemos 'activo' a 0 para marcarlo como inactivo
       where: 'idPlato = ?',
       whereArgs: [idPlato],
     );

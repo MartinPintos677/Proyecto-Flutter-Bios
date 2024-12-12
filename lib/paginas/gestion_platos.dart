@@ -21,7 +21,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     _cargarPlatos();
   }
 
-  // Método para cargar los platos desde la base de datos
+  // Método para cargar los platos activos
   Future<void> _cargarPlatos() async {
     final platos = await _daoPlato.obtenerPlatos();
     setState(() {
@@ -32,7 +32,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
 
   // Método para eliminar un plato
   Future<void> _eliminarPlato(int idPlato) async {
-    await _daoPlato.eliminarPlato(idPlato);
+    await _daoPlato.darBajaPlato(idPlato);
     _cargarPlatos(); // Recargar la lista después de eliminar
   }
 
@@ -41,14 +41,10 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     // Esperamos el valor retornado de la pantalla de agregar plato
     final bool? result = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(
-          builder: (context) =>
-              const PantallaAgregarPlato()), // Pantalla para agregar plato
+      MaterialPageRoute(builder: (context) => const PantallaAgregarPlato()),
     );
 
-    // Verificamos el resultado devuelto (true o false)
     if (result == true) {
-      // Si el resultado es true, significa que un plato fue agregado/actualizado
       _cargarPlatos(); // Recargar la lista después de agregar un plato
     }
   }
@@ -59,12 +55,12 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     final bool? result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (context) => PantallaAgregarPlato(),
+        builder: (context) => const PantallaAgregarPlato(),
         settings: RouteSettings(arguments: plato),
       ),
     );
 
-    // Recargar la lista después de editar
+    // Recarga la lista después de editar
     if (result == true) {
       _cargarPlatos();
     }
@@ -186,9 +182,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                             ? const Color.fromARGB(255, 44, 164, 50)
                             : Colors.red,
                         child: Icon(
-                          plato.activo
-                              ? Icons.check
-                              : Icons.close, // Ícono según disponibilidad
+                          plato.activo ? Icons.check : Icons.close,
                           color: Colors.white,
                         ),
                       ),
@@ -198,7 +192,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                       ),
                       subtitle: Text('Precio: \$${plato.precio}'),
                       trailing: Row(
-                        mainAxisSize: MainAxisSize.min, // Minimiza el tamaño
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.black),
@@ -244,7 +238,8 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
                                 await _eliminarPlato(
                                     plato.idPlato); // Llamar al método eliminar
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Plato eliminado')),
+                                  const SnackBar(
+                                      content: Text('Plato eliminado')),
                                 );
                                 setState(() {
                                   _platosFiltrados.removeAt(
@@ -268,7 +263,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
           _agregarPlato(context);
         },
         backgroundColor: const Color.fromARGB(255, 44, 164, 50),
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add),
         tooltip: 'Agregar Plato',
       ),
     );
