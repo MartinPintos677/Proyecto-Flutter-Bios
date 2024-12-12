@@ -20,11 +20,28 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
     _cargarClientes();
   }
 
+  List<Cliente> _clientesOriginales = []; // Lista original de clientes
   // Método para cargar los clientes desde la base de datos
   Future<void> _cargarClientes() async {
     final clientes = await _daoClientes.getClientes();
     setState(() {
       _clientes = clientes;
+      _clientesOriginales = List.from(clientes); // Guardar copia original
+    });
+  }
+
+// Método para filtrar los clientes por nombre
+  void _filtrarClientes(String query) {
+    setState(() {
+      // Si el campo de búsqueda está vacío, mostramos la lista completa
+      if (query.isEmpty) {
+        _clientes = _clientesOriginales;
+      } else {
+        _clientes = _clientesOriginales
+            .where((cliente) =>
+                cliente.nombre.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
     });
   }
 
@@ -98,7 +115,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
               ),
               onChanged: (value) {
-                // Lógica para filtrar la lista de clientes
+                _filtrarClientes(value);
               },
             ),
             const SizedBox(height: 10),
