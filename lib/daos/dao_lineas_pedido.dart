@@ -1,4 +1,5 @@
 import 'package:formulario_basico/daos/base_datos.dart';
+import 'package:formulario_basico/daos/dao_platos.dart';
 import 'package:formulario_basico/dominio/linea_pedido.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,32 +12,40 @@ class DAOLineasPedido {
     return _instancia;
   }
 
-  // Future<void> agregarLineasPedido(List<LineaPedido> lineas) async {
-  //   Database bd = await BaseDatos().obtenerBaseDatos();
-  //   Map<String, Object?> mapaLinea = lineas.map() //(item) => LineaPedido.fromMap(item as Map<String, Object?>)).toList();
-  //   mapaLinea['id_categoria'] = tarea.categoria.id;
-  //   mapaLinea.remove('categoria');
-  //   try {
-  //     for (var linea in lineas) { 
-  //       await bd.insert( 
-  //         'LineaPedido',
-  //         lineas,
-  //       ); 
-  //     }
-  //   } on DatabaseException {
-  //     throw Exception('No se pudo agregar la tarea.');
-  //   }
-  // }
+  Future<void> agregarLineasPedido(List<LineaPedido> lineas) async {
+    Database bd = await BaseDatos().obtenerBaseDatos();   
+    try {
+      for (var linea in lineas) { 
+        Map<String, Object?> mapaLinea = linea.toMap();
+        mapaLinea["idPlato"] = linea.plato.idPlato; //Tenemos que volver a ponerle el idPlato
+        mapaLinea.remove('plato');//Y sacarle el plato que le habiamos puesto
 
-  // // Obtener todos los clientes
-  // Future<List<Cliente>> getClientes() async {
-  //   Database db = await BaseDatos().obtenerBaseDatos();
-  //   List<Map<String, dynamic>> clientMaps = await db.query('Cliente');
+        await bd.insert( 
+          'LineaPedido',
+          mapaLinea,
+        ); 
+      }
+    } on DatabaseException {
+      throw Exception('No se pudo agregar la linea.');
+    }
+  }
 
-  //   return List.generate(clientMaps.length, (i) {
-  //     return Cliente.fromMap(clientMaps[i]);
-  //   });
-  // }
+
+  Future<List<LineaPedido>> obtenerLineasPorIdPedidoEIdPlato(int idPedido, int idPlato) async {
+    Database db = await BaseDatos().obtenerBaseDatos();
+
+   List<Map<String, Object?>> mapasLineas = (await db.query(
+      'LineasPedido',
+      where: 'idPedido = ? AND idPlato = ?',
+      whereArgs: [idPedido, idPlato],
+    )).map((ml) => {...ml} ,).toList();
+
+    for (Map<String, Object?> ml in mapasLineas) {
+      ml['plato'] = (await DaoPlato().obtenerPlatoPorId(ml['idPlato'] as int))?.toMap();
+    }
+
+    return mapasLineas.map((ml) => LineaPedido.fromMap(ml)).toList();
+  }
 
 
 }

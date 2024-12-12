@@ -1,4 +1,5 @@
 import 'package:formulario_basico/daos/base_datos.dart';
+import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 
@@ -45,5 +46,26 @@ class DaoPlato {
       where: 'idPlato = ?',
       whereArgs: [idPlato],
     );
+  }
+
+  Future<Plato?> obtenerPlatoPorId(int idPlato) async {
+    Database bd = await BaseDatos().obtenerBaseDatos();
+
+    List<Map<String, Object?>> mapasPlato = await bd.query(
+      'Plato',
+      where: 'idPlato = ?',
+      whereArgs: [idPlato],
+    );
+
+    Plato? plato;
+
+    if (mapasPlato.isNotEmpty) {
+      Map<String, Object?> mp = {...mapasPlato.first};
+      mp['cliente'] = (await DaoClientes().getClienteByCedula(mp['cedula'] as String))?.toMap();
+
+      plato = Plato.fromMap(mp);
+    }
+
+    return plato;
   }
 }

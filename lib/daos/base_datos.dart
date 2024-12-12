@@ -2,8 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class BaseDatos {
-  static Database? _database;
-
   // Singleton: Instancia única de la base de datos
   static final BaseDatos instance = BaseDatos._inicializar();
 
@@ -69,6 +67,27 @@ class BaseDatos {
             FOREIGN KEY (idPedido) REFERENCES Pedido(idPedido),
             FOREIGN KEY (idPlato) REFERENCES Plato(idPlato)
           );
+        ''');
+
+        await db.execute('''
+          INSERT INTO Pedido
+          VALUES
+            ('55555555', 0, '2024-12-01 10:00:00', 'Sin observaciones', 500.00, 'Pendiente'),
+            ('55555555', 0, '2024-12-02 11:00:00', 'Entrega urgente', 300.00, 'Pendiente');
+        ''');
+        await db.execute('''
+          INSERT INTO Plato
+          VALUES
+            ('Lunes,Miércoles,Viernes', 'Pasta', NULL, 150.00, 1),
+            ('Martes,Jueves,Sábado', 'Ensalada', NULL, 100.00, 1);
+        ''');
+        await db.execute('''
+          INSERT INTO LineaPedido
+          VALUES
+            (1, 1, 1),
+            (1, 2, 2),
+            (2, 1, 1),
+            (2, 2, 2);
         ''');
       },
       onOpen: (db) {
