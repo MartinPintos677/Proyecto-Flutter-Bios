@@ -76,14 +76,35 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     }
   }
 
-  // Método para elegir foto
+  // Método para elegir foto (galería o cámara)
   Future<void> _elegirFoto() async {
-    final XFile? foto = await _picker.pickImage(source: ImageSource.gallery);
+    final ImageSource? source = await showDialog<ImageSource>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Selecciona una fuente de la foto'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context, ImageSource.camera),
+              child: const Text('Cámara'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, ImageSource.gallery),
+              child: const Text('Galería'),
+            ),
+          ],
+        );
+      },
+    );
 
-    if (foto != null) {
-      setState(() {
-        _fotoPath = foto.path;
-      });
+    if (source != null) {
+      final XFile? foto = await _picker.pickImage(source: source);
+
+      if (foto != null) {
+        setState(() {
+          _fotoPath = foto.path;
+        });
+      }
     }
   }
 
@@ -250,7 +271,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                     ElevatedButton.icon(
                       onPressed: _elegirFoto,
                       icon: const Icon(Icons.photo_camera),
-                      label: const Text('Elegir Foto'),
+                      label: const Text('Tomar o Elegir Foto'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 44, 164, 50),
                         foregroundColor: Colors.white,
