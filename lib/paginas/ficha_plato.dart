@@ -11,6 +11,10 @@ class PantallaFichaPlato extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
 
+    // Convertir los días disponibles (asumiendo que plato.diasDisponibles es un String con días separados por coma)
+    List<String> diasDisponiblesList = plato.diasDisponibles
+        .split(','); // Aquí se asume que los días están separados por comas
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
@@ -43,7 +47,8 @@ class PantallaFichaPlato extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment
+              .start, // Mantener el alineamiento a la izquierda
           children: [
             // Mostrar la foto del plato
             Center(
@@ -84,10 +89,29 @@ class PantallaFichaPlato extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
+
+            // Mostrar los días disponibles
             Text(
-              'Días Disponibles: ${plato.diasDisponibles}',
-              style: const TextStyle(fontSize: 16),
+              'Días Disponibles:',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            const SizedBox(height: 5),
+
+            // Usar un Column para mostrar los días verticalmente centrados
+            Center(
+              // Usamos Center solo para centrar el listado de días
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Centrado horizontal de los días
+                children: diasDisponiblesList.map((dia) {
+                  return Text(
+                    dia.trim(), // Eliminar posibles espacios en blanco
+                    style: const TextStyle(fontSize: 16),
+                  );
+                }).toList(),
+              ),
+            ),
+
             const SizedBox(height: 10),
             Text(
               'Estado: ${plato.activo ? "Activo" : "Inactivo"}',
