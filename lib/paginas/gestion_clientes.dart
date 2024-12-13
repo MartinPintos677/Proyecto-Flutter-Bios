@@ -13,6 +13,7 @@ class PantallaGestionClientes extends StatefulWidget {
 class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
   final DaoClientes _daoClientes = DaoClientes();
   List<Cliente> _clientes = [];
+  List<Cliente> _clientesOriginales = [];
 
   @override
   void initState() {
@@ -20,20 +21,16 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
     _cargarClientes();
   }
 
-  List<Cliente> _clientesOriginales = []; // Lista original de clientes
-  // Método para cargar los clientes desde la base de datos
   Future<void> _cargarClientes() async {
     final clientes = await _daoClientes.getClientes();
     setState(() {
       _clientes = clientes;
-      _clientesOriginales = List.from(clientes); // Guardar copia original
+      _clientesOriginales = List.from(clientes);
     });
   }
 
-// Método para filtrar los clientes por nombre
   void _filtrarClientes(String query) {
     setState(() {
-      // Si el campo de búsqueda está vacío, mostramos la lista completa
       if (query.isEmpty) {
         _clientes = _clientesOriginales;
       } else {
@@ -62,7 +59,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.pop(context); // Volver a la página anterior
+                    Navigator.pop(context);
                   },
                 ),
                 const Text(
@@ -77,7 +74,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/'); // Redirige a inicio
+                      Navigator.pushNamed(context, '/');
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -101,7 +98,6 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
-            // Barra de búsqueda
             TextField(
               decoration: InputDecoration(
                 filled: true,
@@ -119,93 +115,92 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
               },
             ),
             const SizedBox(height: 10),
-
-            // Mostrar clientes
             Expanded(
-              child: _clientes.isEmpty
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Mostrar cargando mientras se obtienen los datos
-                  : ListView.builder(
-                      itemCount: _clientes.length,
-                      itemBuilder: (context, index) {
-                        final cliente = _clientes[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: ListTile(
-                            title: Text(
-                              cliente.nombre,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+              child: Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 80.0), // Espacio para el FAB
+                child: _clientes.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        itemCount: _clientes.length,
+                        itemBuilder: (context, index) {
+                          final cliente = _clientes[index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Cédula: ${cliente.cedula}'),
-                                Text('Dirección: ${cliente.direccion}'),
-                                Text('Teléfono: ${cliente.telefono}'),
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.visibility,
-                                      color: Colors.black),
-                                  tooltip: 'Ver ficha',
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/ficha_cliente',
-                                      arguments: cliente,
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.black),
-                                  tooltip: 'Editar',
-                                  onPressed: () async {
-                                    final resultado = await Navigator.pushNamed(
-                                      context,
-                                      '/agregar_cliente',
-                                      arguments: cliente,
-                                    );
+                            child: ListTile(
+                              title: Text(
+                                cliente.nombre,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Cédula: ${cliente.cedula}'),
+                                  Text('Dirección: ${cliente.direccion}'),
+                                  Text('Teléfono: ${cliente.telefono}'),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.visibility,
+                                        color: Colors.black),
+                                    tooltip: 'Ver ficha',
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/ficha_cliente',
+                                        arguments: cliente,
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.black),
+                                    tooltip: 'Editar',
+                                    onPressed: () async {
+                                      final resultado =
+                                          await Navigator.pushNamed(
+                                        context,
+                                        '/agregar_cliente',
+                                        arguments: cliente,
+                                      );
 
-                                    if (resultado == true) {
-                                      _cargarClientes();
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.black),
-                                  tooltip: 'Eliminar',
-                                  onPressed: () => mostrarConfirmarEliminar(
-                                      context, cliente),
-                                ),
-                              ],
+                                      if (resultado == true) {
+                                        _cargarClientes();
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.black),
+                                    tooltip: 'Eliminar',
+                                    onPressed: () => mostrarConfirmarEliminar(
+                                        context, cliente),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
+              ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Navegar a agregar cliente
           final resultado = await Navigator.pushNamed(
             context,
             '/agregar_cliente',
           );
 
-          // Si el resultado es verdadero, recargar los clientes
           if (resultado == true) {
             _cargarClientes();
           }
@@ -214,6 +209,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
         child: const Icon(Icons.add),
         tooltip: 'Agregar Cliente',
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
