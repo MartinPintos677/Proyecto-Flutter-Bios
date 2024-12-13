@@ -130,11 +130,9 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     String mensaje;
     try {
       if (_plato == null) {
-        // Si es un plato nuevo, usamos toMap() para convertir el objeto Plato en un mapa
         await daoPlato.agregarPlato(plato.toMap());
         mensaje = 'Plato agregado con éxito';
       } else {
-        // Si es un plato existente, actualizamos el plato usando el objeto Plato directamente
         await daoPlato.actualizarPlato(plato);
         mensaje = 'Plato actualizado con éxito';
       }

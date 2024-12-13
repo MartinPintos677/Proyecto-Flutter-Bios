@@ -1,4 +1,3 @@
-import 'package:formulario_basico/dominio/clientes.dart';
 import 'package:formulario_basico/dominio/linea_pedido.dart';
 
 class Pedido {
@@ -9,30 +8,35 @@ class Pedido {
   String estadoEntrega;
   bool cobrado;
 
-  Cliente cliente;
+  String clienteCedula; // Cambio aquí: solo guardamos la cédula
   List<LineaPedido> lineasPedidos;
 
   Pedido({
-    required this.idPedido, 
-    required this.fechaHoraRealizacion, 
-    required this.observaciones, 
-    required this.importeTotal, 
+    required this.idPedido,
+    required this.fechaHoraRealizacion,
+    required this.observaciones,
+    required this.importeTotal,
     required this.estadoEntrega,
     required this.cobrado,
-    required this.cliente,
+    required this.clienteCedula,
     required this.lineasPedidos,
-    });
+  });
 
   factory Pedido.fromMap(Map<String, dynamic> map) {
     return Pedido(
       idPedido: map['idPedido'] as int?,
-      fechaHoraRealizacion: DateTime.parse(map["fechaHoraRealizacion"] as String),
-      observaciones: map['observaciones'] as String, 
+      fechaHoraRealizacion:
+          DateTime.parse(map["fechaHoraRealizacion"] as String),
+      observaciones: map['observaciones'] as String,
       importeTotal: map['importeTotal']?.toDouble() ?? 0.0,
       estadoEntrega: map['estadoEntrega'] as String,
       cobrado: map["cobrado"] as int != 0,
-      cliente: Cliente.fromMap(map['cliente'] as Map<String, Object?>),
-      lineasPedidos: List<LineaPedido>.from((map['lineasPedidos'] as List).map((item) => LineaPedido.fromMap(item as Map<String, Object?>)).toList(),)
+      clienteCedula: map['clienteCedula'] as String,
+      lineasPedidos: List<LineaPedido>.from(
+        (map['lineasPedidos'] as List)
+            .map((item) => LineaPedido.fromMap(item as Map<String, Object?>))
+            .toList(),
+      ),
     );
   }
 
@@ -42,9 +46,9 @@ class Pedido {
       'fechaHoraRealizacion': fechaHoraRealizacion.toIso8601String(),
       'observaciones': observaciones,
       'importeTotal': importeTotal,
-      'estadoEntrega': estadoEntrega, 
-      'cobrado': cobrado ? 1 : 0, 
-      'cliente': cliente.toMap(), 
+      'estadoEntrega': estadoEntrega,
+      'cobrado': cobrado ? 1 : 0,
+      'clienteCedula': clienteCedula, // Solo la cédula
       'lineasPedidos': lineasPedidos.map((linea) => linea.toMap()).toList(),
     };
   }

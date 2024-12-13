@@ -8,44 +8,47 @@ class DAOLineasPedido {
 
   DAOLineasPedido._inicializar();
 
-  factory DAOLineasPedido(){
+  factory DAOLineasPedido() {
     return _instancia;
   }
 
-  Future<void> agregarLineasPedido(List<LineaPedido> lineas) async {
-    Database bd = await BaseDatos().obtenerBaseDatos();   
+  Future<void> agregarLineasPedido(
+      int idPedido, List<LineaPedido> lineas) async {
+    Database bd = await BaseDatos().obtenerBaseDatos();
     try {
-      for (var linea in lineas) { 
+      for (var linea in lineas) {
+        // Convierte la línea de pedido a un mapa
         Map<String, Object?> mapaLinea = linea.toMap();
-        mapaLinea["idPlato"] = linea.plato.idPlato; //Tenemos que volver a ponerle el idPlato
-        mapaLinea.remove('plato');//Y sacarle el plato que le habiamos puesto
+        mapaLinea['idPedido'] =
+            idPedido; // Asociamos el idPedido generado con cada línea
 
-        await bd.insert( 
-          'LineaPedido',
-          mapaLinea,
-        ); 
+        // Insertamos la línea de pedido en la base de datos
+        await bd.insert('LineaPedido', mapaLinea);
       }
-    } on DatabaseException {
-      throw Exception('No se pudo agregar la linea.');
+    } on DatabaseException catch (e) {
+      throw Exception('No se pudo agregar la línea de pedido: $e');
     }
   }
 
-
-  Future<List<LineaPedido>> obtenerLineasPorIdPedidoEIdPlato(int idPedido, int idPlato) async {
+  Future<List<LineaPedido>> obtenerLineasPorIdPedidoEIdPlato(
+      int idPedido, int idPlato) async {
     Database db = await BaseDatos().obtenerBaseDatos();
 
-   List<Map<String, Object?>> mapasLineas = (await db.query(
+    List<Map<String, Object?>> mapasLineas = (await db.query(
       'LineasPedido',
       where: 'idPedido = ? AND idPlato = ?',
       whereArgs: [idPedido, idPlato],
-    )).map((ml) => {...ml} ,).toList();
+    ))
+        .map(
+          (ml) => {...ml},
+        )
+        .toList();
 
     for (Map<String, Object?> ml in mapasLineas) {
-      ml['plato'] = (await DaoPlato().obtenerPlatoPorId(ml['idPlato'] as int))?.toMap();
+      ml['plato'] =
+          (await DaoPlato().obtenerPlatoPorId(ml['idPlato'] as int))?.toMap();
     }
 
     return mapasLineas.map((ml) => LineaPedido.fromMap(ml)).toList();
   }
-
-
 }

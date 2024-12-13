@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/paginas/agregar_pedidos.dart';
 
 class PantallaInicial extends StatelessWidget {
   const PantallaInicial({super.key});
+
+  // Método para navegar a la pantalla de agregar pedido
+  void _agregarPedido(BuildContext context) async {
+    // Esperamos el valor retornado de la pantalla de agregar pedido
+    final bool? result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => const PantallaAgregarPedido()),
+    );
+
+    // Puedes manejar el valor retornado aquí si es necesario
+    // Por ejemplo, si el resultado es `true`, puedes recargar la lista de pedidos.
+    if (result != null && result) {
+      // Aquí puedes hacer algo con el resultado, como actualizar el estado
+      // o recargar la lista de pedidos
+      print("Pedido agregado exitosamente.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +230,8 @@ class PantallaInicial extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Acción para agregar un nuevo pedido
+          // Llamar al método para navegar a la pantalla de agregar pedido
+          _agregarPedido(context);
         },
         backgroundColor: greenColor,
         child: const Icon(Icons.add),

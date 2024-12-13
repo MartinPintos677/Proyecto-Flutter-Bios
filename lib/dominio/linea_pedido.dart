@@ -1,8 +1,8 @@
 import 'package:formulario_basico/dominio/platos.dart';
+
 class LineaPedido {
   Plato plato;
   int cantidad;
-
 
   LineaPedido({required this.plato, required this.cantidad});
 
@@ -13,10 +13,9 @@ class LineaPedido {
     );
   }
 
-
   Map<String, Object?> toMap() {
     return {
-      'plato': plato.toMap(),
+      'idPlato': plato.idPlato, // Usamos idPlato, no el objeto completo
       'cantidad': cantidad,
     };
   }

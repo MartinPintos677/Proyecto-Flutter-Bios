@@ -42,6 +42,7 @@ class Aplicacion extends StatelessWidget {
         '/ficha_cliente': (context) => const PantallaFichaCliente(),
         '/ficha_plato': (context) => PantallaFichaPlato(
             plato: ModalRoute.of(context)!.settings.arguments as Plato),
+        '/agregar_pedidos': (context) => const PantallaAgregarPedido(),
       },
     );
   }
