@@ -69,7 +69,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   Future<void> _crearPedido() async {
     final db = DaoPedidos();
 
-    // Obtener la cédula del cliente seleccionado (no el objeto Cliente)
+    // Obtener la cédula del cliente seleccionado
     final clienteCedula = _cedulaCliente;
 
     // Crear las líneas de pedido
@@ -103,7 +103,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     // Después de insertar el Pedido, insertar las líneas de pedido
     await DAOLineasPedido().agregarLineasPedido(idPedido, lineasPedidos);
 
-    // Regresar a la pantalla principal o mostrar mensaje de éxito
+    // Regresar a la pantalla principal
     Navigator.pop(context);
   }
 
@@ -115,8 +115,8 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _claveFormulario,
+        child: SingleChildScrollView(
+          // Hacemos la pantalla desplazable
           child: Column(
             children: [
               // Seleccionar cliente
@@ -172,7 +172,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                         ? Row(
                             children: [
                               IconButton(
-                                icon: Icon(Icons.remove),
+                                icon: const Icon(Icons.remove),
                                 onPressed: () {
                                   setState(() {
                                     if (_cantidadPlatos[plato.idPlato]! > 1) {
@@ -186,7 +186,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                               Text(
                                   '${_cantidadPlatos[plato.idPlato] ?? 1}'), // Muestra la cantidad
                               IconButton(
-                                icon: Icon(Icons.add),
+                                icon: const Icon(Icons.add),
                                 onPressed: () {
                                   setState(() {
                                     _cantidadPlatos[plato.idPlato] =
@@ -220,13 +220,16 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
               const SizedBox(height: 20),
 
               // Botón para crear el pedido
-              ElevatedButton(
-                onPressed: () {
-                  if (_claveFormulario.currentState?.validate() ?? false) {
-                    _crearPedido();
-                  }
-                },
-                child: const Text('Crear Pedido'),
+              Align(
+                alignment: Alignment.bottomCenter, // Alinea el botón al final
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_claveFormulario.currentState?.validate() ?? false) {
+                      _crearPedido();
+                    }
+                  },
+                  child: const Text('Crear Pedido'),
+                ),
               ),
             ],
           ),

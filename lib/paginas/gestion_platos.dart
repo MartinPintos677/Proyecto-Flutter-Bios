@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:formulario_basico/daos/dao_platos.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 import 'package:formulario_basico/paginas/agregar_plato.dart';
+import 'package:intl/intl.dart';
 
 class PantallaGestionPlatos extends StatefulWidget {
   const PantallaGestionPlatos({super.key});
@@ -14,11 +15,35 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   final DaoPlato _daoPlato = DaoPlato();
   List<Plato> _platos = [];
   List<Plato> _platosFiltrados = [];
+  bool _FiltroPorHoy =
+      false; // Variable para saber si estamos filtrando por hoy
 
   @override
   void initState() {
     super.initState();
     _cargarPlatos();
+  }
+
+  // Método para obtener el día de hoy en español
+  String obtenerDiaHoyEnEspaniol() {
+    final DateTime now = DateTime.now();
+    // Obtenemos el día en inglés
+    String diaIngles = DateFormat('EEEE', 'en_US').format(now).toLowerCase();
+
+    // Mapa para traducir los días de inglés a español
+    final Map<String, String> diasInglesAEspanol = {
+      'monday': 'lunes',
+      'tuesday': 'martes',
+      'wednesday': 'miércoles',
+      'thursday': 'jueves',
+      'friday': 'viernes',
+      'saturday': 'sábado',
+      'sunday': 'domingo',
+    };
+
+    // Devolvemos el día en español
+    return diasInglesAEspanol[diaIngles] ??
+        ''; // Si no encuentra el día, retorna una cadena vacía
   }
 
   // Método para cargar los platos activos
@@ -27,6 +52,32 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     setState(() {
       _platos = platos;
       _platosFiltrados = platos; // Inicialmente, mostrar todos los platos
+    });
+  }
+
+// Método para filtrar los platos disponibles hoy
+  void _filtrarPlatosDisponiblesHoy() {
+    final diaHoy = obtenerDiaHoyEnEspaniol().toLowerCase();
+
+    setState(() {
+      _platosFiltrados = _platos.where((plato) {
+        List<String> diasDisponibles = plato.diasDisponibles
+            .split(',')
+            .map((e) => e.trim().toLowerCase())
+            .toList();
+
+        return diasDisponibles.contains(diaHoy);
+      }).toList();
+      _FiltroPorHoy =
+          true; // Actualizamos el estado para indicar que estamos filtrando por hoy
+    });
+  }
+
+// Método para mostrar todos los platos
+  void _mostrarTodosLosPlatos() {
+    setState(() {
+      _platosFiltrados = _platos; // Mostramos todos los platos
+      _FiltroPorHoy = false; // Restablecemos el filtro
     });
   }
 
@@ -153,10 +204,16 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () {
-                    // Lógica para filtrar los platos disponibles hoy
+                    // Si ya estamos filtrando por hoy, restauramos todos los platos
+                    if (_FiltroPorHoy) {
+                      _mostrarTodosLosPlatos();
+                    } else {
+                      // Si no estamos filtrando por hoy, aplicamos el filtro
+                      _filtrarPlatosDisponiblesHoy();
+                    }
                   },
                   icon: const Icon(Icons.filter_list),
-                  label: const Text('Disponibles Hoy'),
+                  label: Text(_FiltroPorHoy ? 'Ver Todos' : 'Disponibles Hoy'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 44, 164, 50),
                     foregroundColor: Colors.white,
