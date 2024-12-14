@@ -9,7 +9,7 @@ class Pedido {
   bool cobrado;
 
   String clienteCedula; // Cambio aquí: solo guardamos la cédula
-  List<LineaPedido> lineasPedidos;
+  final List<LineaPedido>? lineasPedidos;
 
   Pedido({
     required this.idPedido,
@@ -19,24 +19,18 @@ class Pedido {
     required this.estadoEntrega,
     required this.cobrado,
     required this.clienteCedula,
-    required this.lineasPedidos,
+    this.lineasPedidos,
   });
 
   factory Pedido.fromMap(Map<String, dynamic> map) {
     return Pedido(
       idPedido: map['idPedido'] as int?,
-      fechaHoraRealizacion:
-          DateTime.parse(map["fechaHoraRealizacion"] as String),
+      fechaHoraRealizacion: DateTime.parse(map["fechaHoraRealizacion"] as String),
       observaciones: map['observaciones'] as String,
       importeTotal: map['importeTotal']?.toDouble() ?? 0.0,
       estadoEntrega: map['estadoEntrega'] as String,
       cobrado: map["cobrado"] as int != 0,
-      clienteCedula: map['clienteCedula'] as String,
-      lineasPedidos: List<LineaPedido>.from(
-        (map['lineasPedidos'] as List)
-            .map((item) => LineaPedido.fromMap(item as Map<String, Object?>))
-            .toList(),
-      ),
+      clienteCedula: map['cedula'] as String,
     );
   }
 
@@ -49,7 +43,7 @@ class Pedido {
       'estadoEntrega': estadoEntrega,
       'cobrado': cobrado ? 1 : 0,
       'clienteCedula': clienteCedula, // Solo la cédula
-      'lineasPedidos': lineasPedidos.map((linea) => linea.toMap()).toList(),
+      'lineasPedidos': lineasPedidos?.map((linea) => linea.toMap()).toList(),
     };
   }
 }

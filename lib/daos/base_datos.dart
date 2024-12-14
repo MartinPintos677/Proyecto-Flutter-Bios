@@ -88,24 +88,25 @@ class BaseDatos {
         ''');
 
         await db.execute('''
-  INSERT INTO Plato (diasDisponibles, nombre, foto, precio, activo)
-  VALUES
-    ('Lunes,Miércoles,Viernes', 'Pasta', NULL, 150.00, 1),
-    ('Martes,Jueves,Sábado', 'Ensalada', NULL, 100.00, 1),
-    ('Todos', 'Hamburguesa', NULL, 200.00, 1),
-    ('Lunes,Martes', 'Pizza', NULL, 180.00, 1),
-    ('Viernes,Sábado', 'Chivito', NULL, 250.00, 1),
-    ('Domingo', 'Milanesa con papas fritas', NULL, 220.00, 1),
-    ('Todos', 'Tarta de verduras', NULL, 120.00, 1),
-    ('Lunes,Miércoles', 'Sopa de lentejas', NULL, 130.00, 1),
-    ('Martes,Jueves', 'Risotto', NULL, 180.00, 1),
-    ('Viernes', 'Pescado a la parrilla', NULL, 270.00, 1);
-''');
+        INSERT INTO Plato (diasDisponibles, nombre, foto, precio, activo)
+        VALUES
+          ('Lunes,Miércoles,Viernes', 'Pasta', NULL, 150.00, 1),
+          ('Martes,Jueves,Sábado', 'Ensalada', NULL, 100.00, 1),
+          ('Todos', 'Hamburguesa', NULL, 200.00, 1),
+          ('Lunes,Martes', 'Pizza', NULL, 180.00, 1),
+          ('Viernes,Sábado', 'Chivito', NULL, 250.00, 1),
+          ('Domingo', 'Milanesa con papas fritas', NULL, 220.00, 1),
+          ('Todos', 'Tarta de verduras', NULL, 120.00, 1),
+          ('Lunes,Miércoles', 'Sopa de lentejas', NULL, 130.00, 1),
+          ('Martes,Jueves', 'Risotto', NULL, 180.00, 1),
+          ('Viernes', 'Pescado a la parrilla', NULL, 270.00, 1);
+      ''');
 
         await db.execute('''
           INSERT INTO Pedido (cedula, cobrado, fechaHoraRealizacion, observaciones, importeTotal, estadoEntrega)
           VALUES
             ('12345678', 0, '2024-12-01 10:00:00', 'Sin observaciones', 500.00, 'Pendiente'),
+            ('12345678', 1, '2024-12-01 10:00:00', 'Sin observaciones', 400.00, 'Pendiente'),
             ('12345678', 0, '2024-12-02 11:00:00', 'Entrega urgente', 300.00, 'Pendiente'),
             ('87654321', 1, '2024-12-03 12:00:00', NULL, 200.00, 'Entregado');
         ''');

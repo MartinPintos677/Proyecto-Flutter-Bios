@@ -1,26 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/daos/dao_pedidos.dart';
 import 'package:formulario_basico/dominio/clientes.dart';
+import 'package:formulario_basico/dominio/pedido.dart';
 
-class PantallaFichaCliente extends StatelessWidget {
+class PantallaFichaCliente extends StatefulWidget {
   const PantallaFichaCliente({super.key});
 
   @override
+  State<PantallaFichaCliente> createState() => _PantallaFichaClienteState();
+
+
+}
+
+class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
+
+
+  Cliente? cliente;
+  List<Pedido> pedidos = [];
+  double importeTotal = 0;
+
+
+
+  @override
+  void didChangeDependencies() {
+    cliente = ModalRoute.of(context)!.settings.arguments as Cliente?;
+    _cargarPedidos();
+
+    super.didChangeDependencies();
+  }
+
+  Future<void> _cargarPedidos() async {
+    final _pedidos = await DaoPedidos().obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
+    setState((){ 
+    pedidos = List.from(_pedidos);
+    for(Pedido p in pedidos){
+      importeTotal = importeTotal + p.importeTotal;
+    }
+  });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Recibe los datos del cliente
-    Cliente cliente = ModalRoute.of(context)!.settings.arguments as Cliente;
-
-    final List<Map<String, dynamic>> pedidos = [
-      {'id': 1, 'importe': 1500.0},
-      {'id': 2, 'importe': 2000.0},
-    ];
-
     const Color primaryColor = Colors.black;
     const Color greenColor = Color.fromARGB(255, 44, 164, 50);
-
-    double totalAdeudado = pedidos.fold(
-      0.0,
-      (sum, pedido) => sum + (pedido['importe'] as double),
-    );
 
     return Scaffold(
       appBar: PreferredSize(
@@ -39,7 +61,7 @@ class PantallaFichaCliente extends StatelessWidget {
                   },
                 ),
                 Text(
-                  'Ficha de ${cliente}',
+                  'Ficha de ${cliente!.nombre}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -81,7 +103,9 @@ class PantallaFichaCliente extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
+              child: pedidos.isEmpty 
+                ? const Text("No hay Pedidos Pendientes de pago", textAlign: TextAlign.center,) 
+                : ListView.builder(
                 itemCount: pedidos.length,
                 itemBuilder: (context, index) {
                   final pedido = pedidos[index];
@@ -99,18 +123,18 @@ class PantallaFichaCliente extends StatelessWidget {
                         ),
                       ),
                       title: Text(
-                        'Pedido #${pedido['id']}',
+                        'Pedido #${pedido.idPedido}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text('Importe: \$${pedido['importe']}'),
+                      subtitle: Text('Importe: \$${pedido.importeTotal}'),
                     ),
                   );
                 },
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              'Total Adeudado: \$${totalAdeudado.toStringAsFixed(2)}',
+            if(pedidos.isNotEmpty) Text(
+              'Total Adeudado: \$$importeTotal',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -118,9 +142,11 @@ class PantallaFichaCliente extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Center(
+            if(pedidos.isNotEmpty)Center(
               child: ElevatedButton.icon(
                 onPressed: () {
+                  DaoPedidos().actualizarEstadoCobradoPedido(pedidos);
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Todos los pedidos han sido abonados'),

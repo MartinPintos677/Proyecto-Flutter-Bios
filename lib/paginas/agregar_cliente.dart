@@ -97,6 +97,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                 children: [
                   // Campo para la cédula
                   TextFormField(
+                    enabled: _cliente != null ? false : true,
                     decoration: InputDecoration(
                       labelText: 'Cédula',
                       border: OutlineInputBorder(

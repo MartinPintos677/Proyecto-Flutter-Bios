@@ -223,8 +223,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Eliminar Cliente"),
-        content: Text(
-            "Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
+        content: Text("Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
         actions: [
           TextButton(
             onPressed: () async {
@@ -236,8 +235,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
 
                 _cargarClientes();
               } on Exception catch (e) {
-                mensaje =
-                    'Error ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
+                mensaje = 'No se puede eliminar, tiene un Pedido asociado';
               }
 
               if (context.mounted) {

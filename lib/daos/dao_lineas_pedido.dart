@@ -30,14 +30,13 @@ class DAOLineasPedido {
     }
   }
 
-  Future<List<LineaPedido>> obtenerLineasPorIdPedidoEIdPlato(
-      int idPedido, int idPlato) async {
+  Future<List<LineaPedido>> obtenerLineasPorIdPedido(int? idPedido) async {
     Database db = await BaseDatos().obtenerBaseDatos();
 
     List<Map<String, Object?>> mapasLineas = (await db.query(
       'LineasPedido',
-      where: 'idPedido = ? AND idPlato = ?',
-      whereArgs: [idPedido, idPlato],
+      where: 'idPedido = ?',
+      whereArgs: [idPedido],
     ))
         .map(
           (ml) => {...ml},
@@ -45,8 +44,7 @@ class DAOLineasPedido {
         .toList();
 
     for (Map<String, Object?> ml in mapasLineas) {
-      ml['plato'] =
-          (await DaoPlato().obtenerPlatoPorId(ml['idPlato'] as int))?.toMap();
+      ml['plato'] = (await DaoPlato().obtenerPlatoPorId(ml['idPlato'] as int))?.toMap();
     }
 
     return mapasLineas.map((ml) => LineaPedido.fromMap(ml)).toList();
