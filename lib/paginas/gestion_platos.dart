@@ -223,103 +223,104 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: _platosFiltrados.length,
-                itemBuilder: (context, index) {
-                  final plato = _platosFiltrados[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: plato.activo
-                            ? const Color.fromARGB(255, 44, 164, 50)
-                            : Colors.red,
-                        child: Icon(
-                          plato.activo ? Icons.check : Icons.close,
-                          color: Colors.white,
+              child: Padding(
+                padding:
+                    const EdgeInsets.only(bottom: 80.0), // Espacio para el FAB
+                child: ListView.builder(
+                  itemCount: _platosFiltrados.length,
+                  itemBuilder: (context, index) {
+                    final plato = _platosFiltrados[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: plato.activo
+                              ? const Color.fromARGB(255, 44, 164, 50)
+                              : Colors.red,
+                          child: Icon(
+                            plato.activo ? Icons.check : Icons.close,
+                            color: Colors.white,
+                          ),
+                        ),
+                        title: Text(
+                          plato.nombre,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text('Precio: \$${plato.precio}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.visibility,
+                                  color: Colors.black),
+                              tooltip: 'Ver ficha',
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/ficha_plato',
+                                  arguments: plato,
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.black),
+                              onPressed: () {
+                                _editarPlato(plato);
+                              },
+                            ),
+                            IconButton(
+                              icon:
+                                  const Icon(Icons.delete, color: Colors.black),
+                              onPressed: () async {
+                                bool confirmDelete = await showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('Eliminar Plato'),
+                                          content: Text(
+                                            '¿Estás seguro de eliminar el plato "${plato.nombre}"?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pop(false);
+                                              },
+                                              child: const Text('Cancelar'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true);
+                                              },
+                                              child: const Text('Eliminar'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ) ??
+                                    false;
+
+                                if (confirmDelete) {
+                                  await _eliminarPlato(plato.idPlato);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Plato eliminado')),
+                                  );
+                                  setState(() {
+                                    _platosFiltrados.removeAt(index);
+                                  });
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      title: Text(
-                        plato.nombre,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text('Precio: \$${plato.precio}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.visibility,
-                                color: Colors.black),
-                            tooltip: 'Ver ficha',
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                context,
-                                '/ficha_plato',
-                                arguments: plato,
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.black),
-                            onPressed: () {
-                              // Lógica para editar el plato
-                              _editarPlato(plato);
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.black),
-                            onPressed: () async {
-                              bool confirmDelete = await showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text('Eliminar Plato'),
-                                        content: Text(
-                                          '¿Estás seguro de eliminar el plato "${plato.nombre}"?',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(
-                                                  false); // Cancela la eliminación
-                                            },
-                                            child: const Text('Cancelar'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(
-                                                  true); // Confirma la eliminación
-                                            },
-                                            child: const Text('Eliminar'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ) ??
-                                  false;
-
-                              // Si se confirma la eliminación, se elimina el plato
-                              if (confirmDelete) {
-                                await _eliminarPlato(plato.idPlato);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('Plato eliminado')),
-                                );
-                                setState(() {
-                                  _platosFiltrados.removeAt(
-                                      index); // Actualiza la lista de platos
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -333,6 +334,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
         child: const Icon(Icons.add),
         tooltip: 'Agregar Plato',
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

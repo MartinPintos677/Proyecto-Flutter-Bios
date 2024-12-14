@@ -10,21 +10,23 @@ class BaseDatos {
   BaseDatos._inicializar();
 
   factory BaseDatos() {
-    //El constructor es sin nombre, por defecto
     return instance;
   }
 
   Future<Database> obtenerBaseDatos() async {
     if (_baseDeDatos != null) return _baseDeDatos!;
 
-    final String rutasDirectoriosBDs =
-        await getDatabasesPath(); //Tenemos la ruta absoluta de el directorio deonde estaría la BD
+    final String rutasDirectoriosBDs = await getDatabasesPath();
     final String rutaArchivoBD = join(rutasDirectoriosBDs, "bios_lunch.sqlite");
+
+    // **Elimina la base de datos existente para forzar la recreación**
+    await deleteDatabase(rutaArchivoBD);
 
     _baseDeDatos = await openDatabase(
       rutaArchivoBD,
       version: 1,
       onCreate: (db, version) async {
+        print("Creando la base de datos...");
         await db.execute('''
           CREATE TABLE Cliente (
             cedula TEXT PRIMARY KEY, 
@@ -69,32 +71,59 @@ class BaseDatos {
           );
         ''');
 
+        print("Insertando datos de prueba...");
         await db.execute('''
-          INSERT INTO Pedido
+          INSERT INTO Cliente (cedula, nombre, telefonoContacto, direccionEntrega)
           VALUES
-            ('55555555', 0, '2024-12-01 10:00:00', 'Sin observaciones', 500.00, 'Pendiente'),
-            ('55555555', 0, '2024-12-02 11:00:00', 'Entrega urgente', 300.00, 'Pendiente');
+            ('12345678', 'Juan Pérez', '123456789', 'Av. Libertador 123'),
+            ('87654321', 'Ana López', '987654321', 'Calle Ficticia 456'),
+            ('11223344', 'Carlos García', '112233445', 'Calle Real 789'),
+            ('34567890', 'María Fernández', '543216789', 'Av. Italia 345'),
+            ('98765432', 'José Rodríguez', '987654987', 'Calle Artigas 789'),
+            ('45678901', 'Lucía Martínez', '456789123', 'Calle Rivera 123'),
+            ('23456789', 'Sofía Gómez', '234567890', 'Av. Ricaldoni 678'),
+            ('56789012', 'Ricardo López', '567890123', 'Calle 18 de Julio 456'),
+            ('67890123', 'Martina Silva', '678901234', 'Calle Sarandí 987'),
+            ('89012345', 'Julieta Méndez', '890123456', 'Calle Piedras 345');
         ''');
+
         await db.execute('''
-          INSERT INTO Plato
+  INSERT INTO Plato (diasDisponibles, nombre, foto, precio, activo)
+  VALUES
+    ('Lunes,Miércoles,Viernes', 'Pasta', NULL, 150.00, 1),
+    ('Martes,Jueves,Sábado', 'Ensalada', NULL, 100.00, 1),
+    ('Todos', 'Hamburguesa', NULL, 200.00, 1),
+    ('Lunes,Martes', 'Pizza', NULL, 180.00, 1),
+    ('Viernes,Sábado', 'Chivito', NULL, 250.00, 1),
+    ('Domingo', 'Milanesa con papas fritas', NULL, 220.00, 1),
+    ('Todos', 'Tarta de verduras', NULL, 120.00, 1),
+    ('Lunes,Miércoles', 'Sopa de lentejas', NULL, 130.00, 1),
+    ('Martes,Jueves', 'Risotto', NULL, 180.00, 1),
+    ('Viernes', 'Pescado a la parrilla', NULL, 270.00, 1);
+''');
+
+        await db.execute('''
+          INSERT INTO Pedido (cedula, cobrado, fechaHoraRealizacion, observaciones, importeTotal, estadoEntrega)
           VALUES
-            ('Lunes,Miércoles,Viernes', 'Pasta', NULL, 150.00, 1),
-            ('Martes,Jueves,Sábado', 'Ensalada', NULL, 100.00, 1);
+            ('12345678', 0, '2024-12-01 10:00:00', 'Sin observaciones', 500.00, 'Pendiente'),
+            ('12345678', 0, '2024-12-02 11:00:00', 'Entrega urgente', 300.00, 'Pendiente'),
+            ('87654321', 1, '2024-12-03 12:00:00', NULL, 200.00, 'Entregado');
         ''');
+
         await db.execute('''
-          INSERT INTO LineaPedido
+          INSERT INTO LineaPedido (idPedido, idPlato, cantidad)
           VALUES
-            (1, 1, 1),
-            (1, 2, 2),
+            (1, 1, 2),
+            (1, 2, 1),
             (2, 1, 1),
-            (2, 2, 2);
+            (2, 3, 2),
+            (3, 4, 1);
         ''');
+        print("Datos de prueba insertados.");
       },
       onOpen: (db) {
-        //En SQLite, las reestricciones foraneas estan deshabilitadas de manera predeterminada por cuestiones de retrocompatibilidad
-        //Para habilitarla en la conexion actual:
-        db.execute(
-            'PRAGMA foreign_keys = ON;'); //Solo se ejecuta cuando abrimos la bd por primera vez porque esta en el onOpen
+        db.execute('PRAGMA foreign_keys = ON;');
+        print("Base de datos abierta.");
       },
     );
 
@@ -102,8 +131,7 @@ class BaseDatos {
   }
 
   Future<void> cerrarBaseDatos() async {
-    await _baseDeDatos?.close(); //Si no es nulo
-
+    await _baseDeDatos?.close();
     _baseDeDatos = null;
   }
 }

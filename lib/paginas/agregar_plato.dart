@@ -271,7 +271,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                     ElevatedButton.icon(
                       onPressed: _elegirFoto,
                       icon: const Icon(Icons.photo_camera),
-                      label: const Text('Tomar o Elegir Foto'),
+                      label: const Text('Foto'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 44, 164, 50),
                         foregroundColor: Colors.white,
