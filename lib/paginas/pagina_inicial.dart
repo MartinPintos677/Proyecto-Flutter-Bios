@@ -1,70 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:formulario_basico/daos/dao_pedidos.dart';
+import 'package:formulario_basico/dominio/pedido.dart';
 import 'package:formulario_basico/paginas/agregar_pedidos.dart';
 
-class PantallaInicial extends StatelessWidget {
+class PantallaInicial extends StatefulWidget {
   const PantallaInicial({super.key});
 
-  // Método para navegar a la pantalla de agregar pedido
+  @override
+  State<PantallaInicial> createState() => _PantallaInicialState();
+}
+
+class _PantallaInicialState extends State<PantallaInicial> {
+  final DaoPedidos _daoPedidos = DaoPedidos();
+  List<Pedido> _pedidos = [];
+  List<Pedido> _pedidosFiltrados = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarPedidos();
+  }
+
+  Future<void> _cargarPedidos() async {
+    final pedidos = await _daoPedidos.obtenerPedidos();
+    print("Pedidos cargados: $pedidos");
+
+    setState(() {
+      _pedidos = pedidos;
+      _pedidosFiltrados = List.from(pedidos); // Copia para filtrar
+    });
+  }
+
+  void _filtrarPedidos(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _pedidosFiltrados = _pedidos;
+      } else {
+        _pedidosFiltrados = _pedidos
+            .where((pedido) => pedido.clienteCedula
+                .toLowerCase()
+                .contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
   void _agregarPedido(BuildContext context) async {
-    // Esperamos el valor retornado de la pantalla de agregar pedido
     final bool? result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (context) => const PantallaAgregarPedido()),
     );
 
-    // Puedes manejar el valor retornado aquí si es necesario
-    // Por ejemplo, si el resultado es `true`, puedes recargar la lista de pedidos.
     if (result != null && result) {
-      // Aquí puedes hacer algo con el resultado, como actualizar el estado
-      // o recargar la lista de pedidos
-      print("Pedido agregado exitosamente.");
+      _cargarPedidos();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Colors.black; // Header en negro
-    final Color backgroundColor = Colors.grey[100]!; // Fondo general
+    const Color primaryColor = Colors.black;
+    final Color backgroundColor = Colors.grey[100]!;
     const Color greenColor = Color.fromARGB(255, 44, 164, 50);
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80), // Altura personalizada
+        preferredSize: const Size.fromHeight(80),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: primaryColor, // Fondo negro
+          color: primaryColor,
           child: SafeArea(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Menú en la izquierda
                 Builder(
                   builder: (BuildContext context) {
                     return IconButton(
                       icon: const Icon(Icons.menu, color: Colors.white),
                       onPressed: () {
-                        Scaffold.of(context).openDrawer(); // Abre el Drawer
+                        Scaffold.of(context).openDrawer();
                       },
                     );
                   },
                 ),
-                // Título centrado
                 const Text(
                   'Pedidos Pendientes',
                   style: TextStyle(
-                    color: Colors.white, // Texto blanco
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
-                // Logo en la derecha
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Image.asset(
-                    'assets/img/logo.jpg', // Ruta de la imagen del logo
+                    'assets/img/logo.jpg',
                     width: 50,
                     height: 45,
                   ),
@@ -79,9 +111,7 @@ class PantallaInicial extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.black,
-              ),
+              decoration: const BoxDecoration(color: Colors.black),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -93,7 +123,7 @@ class PantallaInicial extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Image.asset(
-                      'assets/img/logo.jpg', // Ruta de la imagen del logo
+                      'assets/img/logo.jpg',
                       fit: BoxFit.scaleDown,
                     ),
                   ),
@@ -137,91 +167,129 @@ class PantallaInicial extends StatelessWidget {
         ),
       ),
       body: Container(
-        color: backgroundColor, // Fondo gris claro
+        color: backgroundColor,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              // Barra de búsqueda
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextField(
                   cursorColor: Colors.grey[600],
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white, // Fondo blanco
-                    labelText: 'Buscar pedido por cliente',
-                    labelStyle: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                    floatingLabelStyle: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
+                    fillColor: Colors.white,
+                    labelText: 'Buscar por cédula de cliente',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: primaryColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.black),
                     ),
                     prefixIcon: Icon(
                       Icons.search,
                       color: Colors.grey[600],
                     ),
                   ),
-                  style: const TextStyle(
-                    backgroundColor: Colors.transparent,
-                  ),
-                  onChanged: (value) {
-                    // Lógica de búsqueda
-                  },
+                  onChanged: (value) => _filtrarPedidos(value),
                 ),
               ),
               const SizedBox(height: 10),
-              // Listado de pedidos
               Expanded(
-                child: ListView.builder(
-                  itemCount: 10, // Número de pedidos
-                  itemBuilder: (context, index) {
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: greenColor,
-                          child: Text(
-                            '#${index + 1}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 80.0),
+                  child: _pedidosFiltrados.isEmpty
+                      ? const Center(
+                          child: Text('No hay pedidos disponibles'),
+                        )
+                      : ListView.builder(
+                          itemCount: _pedidosFiltrados.length,
+                          itemBuilder: (context, index) {
+                            final pedido = _pedidosFiltrados[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0, vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: greenColor,
+                                      child: Text(
+                                        '#${pedido.idPedido}',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Cédula: ${pedido.clienteCedula}',
+                                            style: TextStyle(
+                                              color: Colors.grey[800],
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Total: \$${pedido.importeTotal.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              color: Colors.grey[800],
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Estado: ${pedido.estadoEntrega}',
+                                            style: TextStyle(
+                                              color: Colors.grey[800],
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.visibility,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            print(
+                                                'Ver detalles del pedido ${pedido.idPedido}');
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            print(
+                                                'Editar pedido ${pedido.idPedido}');
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.black),
+                                          onPressed: () {
+                                            print(
+                                                'Eliminar pedido ${pedido.idPedido}');
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        title: Text(
-                          'Pedido #$index',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Text(
-                          'Cliente: Juan Pérez\nTotal: \$1500',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          // Navegar a detalles del pedido
-                        },
-                      ),
-                    );
-                  },
                 ),
               ),
             ],
@@ -229,14 +297,12 @@ class PantallaInicial extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Llamar al método para navegar a la pantalla de agregar pedido
-          _agregarPedido(context);
-        },
+        onPressed: () => _agregarPedido(context),
         backgroundColor: greenColor,
         child: const Icon(Icons.add),
         tooltip: 'Nuevo Pedido',
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

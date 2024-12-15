@@ -3,18 +3,18 @@ import 'package:formulario_basico/dominio/linea_pedido.dart';
 class Pedido {
   int? idPedido;
   DateTime fechaHoraRealizacion;
-  String observaciones;
+  String? observaciones;
   double importeTotal;
   String estadoEntrega;
   bool cobrado;
 
-  String clienteCedula; // Cambio aquí: solo guardamos la cédula
+  String clienteCedula; // Guardamos solo la cédula
   final List<LineaPedido>? lineasPedidos;
 
   Pedido({
     required this.idPedido,
     required this.fechaHoraRealizacion,
-    required this.observaciones,
+    this.observaciones,
     required this.importeTotal,
     required this.estadoEntrega,
     required this.cobrado,
@@ -25,12 +25,14 @@ class Pedido {
   factory Pedido.fromMap(Map<String, dynamic> map) {
     return Pedido(
       idPedido: map['idPedido'] as int?,
-      fechaHoraRealizacion: DateTime.parse(map["fechaHoraRealizacion"] as String),
-      observaciones: map['observaciones'] as String,
-      importeTotal: map['importeTotal']?.toDouble() ?? 0.0,
+      fechaHoraRealizacion:
+          DateTime.parse(map['fechaHoraRealizacion'] as String),
+      observaciones: map['observaciones'] as String?,
+      importeTotal: (map['importeTotal'] as num).toDouble(),
       estadoEntrega: map['estadoEntrega'] as String,
-      cobrado: map["cobrado"] as int != 0,
+      cobrado: (map['cobrado'] as int) != 0,
       clienteCedula: map['cedula'] as String,
+      lineasPedidos: null, // Cargar líneas por separado si es necesario
     );
   }
 
@@ -42,8 +44,7 @@ class Pedido {
       'importeTotal': importeTotal,
       'estadoEntrega': estadoEntrega,
       'cobrado': cobrado ? 1 : 0,
-      'clienteCedula': clienteCedula, // Solo la cédula
-      'lineasPedidos': lineasPedidos?.map((linea) => linea.toMap()).toList(),
+      'cedula': clienteCedula, // Solo la cédula
     };
   }
 }
