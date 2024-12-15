@@ -9,6 +9,7 @@ class Pedido {
   bool cobrado;
 
   String clienteCedula; // Guardamos solo la cédula
+  String? clienteNombre; // Nuevo campo para almacenar el nombre del cliente
   final List<LineaPedido>? lineasPedidos;
 
   Pedido({
@@ -19,6 +20,7 @@ class Pedido {
     required this.estadoEntrega,
     required this.cobrado,
     required this.clienteCedula,
+    this.clienteNombre, // Inicializa el nuevo campo
     this.lineasPedidos,
   });
 
@@ -32,6 +34,7 @@ class Pedido {
       estadoEntrega: map['estadoEntrega'] as String,
       cobrado: (map['cobrado'] as int) != 0,
       clienteCedula: map['cedula'] as String,
+      clienteNombre: null, // Se asignará después de obtener del DAO de clientes
       lineasPedidos: null, // Cargar líneas por separado si es necesario
     );
   }

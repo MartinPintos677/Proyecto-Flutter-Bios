@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:formulario_basico/daos/dao_pedidos.dart';
+import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
 import 'package:formulario_basico/paginas/agregar_pedidos.dart';
 
@@ -12,6 +13,7 @@ class PantallaInicial extends StatefulWidget {
 
 class _PantallaInicialState extends State<PantallaInicial> {
   final DaoPedidos _daoPedidos = DaoPedidos();
+  final DaoClientes _daoClientes = DaoClientes();
   List<Pedido> _pedidos = [];
   List<Pedido> _pedidosFiltrados = [];
 
@@ -23,11 +25,21 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
   Future<void> _cargarPedidos() async {
     final pedidos = await _daoPedidos.obtenerPedidos();
-    print("Pedidos cargados: $pedidos");
+
+    // Filtrar solo los pedidos con estado "Pendiente"
+    final pedidosPendientes =
+        pedidos.where((pedido) => pedido.estadoEntrega == "Pendiente").toList();
+
+    // Asociar nombre del cliente a cada pedido
+    for (var pedido in pedidosPendientes) {
+      final cliente =
+          await _daoClientes.getClienteByCedula(pedido.clienteCedula);
+      pedido.clienteNombre = cliente?.nombre ?? "Desconocido"; // Asociar nombre
+    }
 
     setState(() {
-      _pedidos = pedidos;
-      _pedidosFiltrados = List.from(pedidos); // Copia para filtrar
+      _pedidos = pedidosPendientes;
+      _pedidosFiltrados = List.from(pedidosPendientes); // Copia para filtrar
     });
   }
 
@@ -52,7 +64,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
     );
 
     if (result != null && result) {
-      _cargarPedidos();
+      _cargarPedidos(); // Recargar la lista si se agregó un pedido
     }
   }
 
@@ -197,7 +209,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   padding: const EdgeInsets.only(bottom: 80.0),
                   child: _pedidosFiltrados.isEmpty
                       ? const Center(
-                          child: Text('No hay pedidos disponibles'),
+                          child: Text('No hay pedidos pendientes disponibles'),
                         )
                       : ListView.builder(
                           itemCount: _pedidosFiltrados.length,
@@ -237,7 +249,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'Total: \$${pedido.importeTotal.toStringAsFixed(2)}',
+                                            '${pedido.clienteNombre}',
                                             style: TextStyle(
                                               color: Colors.grey[800],
                                               fontSize: 14,
@@ -245,7 +257,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            'Estado: ${pedido.estadoEntrega}',
+                                            'Total: \$${pedido.importeTotal.toStringAsFixed(2)}',
                                             style: TextStyle(
                                               color: Colors.grey[800],
                                               fontSize: 14,
