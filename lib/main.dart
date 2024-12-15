@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:formulario_basico/dominio/platos.dart';
+import 'package:formulario_basico/dominio/pedido.dart';
 import 'package:formulario_basico/paginas/paginas.dart'; // Importa todas las páginas desde paginas.dart
 
 void main() {
@@ -43,6 +44,10 @@ class Aplicacion extends StatelessWidget {
         '/ficha_plato': (context) => PantallaFichaPlato(
             plato: ModalRoute.of(context)!.settings.arguments as Plato),
         '/agregar_pedidos': (context) => const PantallaAgregarPedido(),
+        '/ficha_pedido': (context) {
+          final pedido = ModalRoute.of(context)!.settings.arguments as Pedido;
+          return PantallaFichaPedido(pedido: pedido);
+        },
       },
     );
   }

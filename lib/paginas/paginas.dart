@@ -7,3 +7,4 @@ export 'package:formulario_basico/paginas/agregar_cliente.dart';
 export 'package:formulario_basico/paginas/ficha_cliente.dart';
 export 'package:formulario_basico/paginas/ficha_plato.dart';
 export 'package:formulario_basico/paginas/agregar_pedidos.dart';
+export 'package:formulario_basico/paginas/ficha_pedido.dart';

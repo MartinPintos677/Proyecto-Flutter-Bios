@@ -274,8 +274,12 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           icon: const Icon(Icons.visibility,
                                               color: Colors.black),
                                           onPressed: () {
-                                            print(
-                                                'Ver detalles del pedido ${pedido.idPedido}');
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/ficha_pedido', // Navega a la ficha de pedido
+                                              arguments:
+                                                  pedido, // Pasa el objeto pedido como argumento
+                                            );
                                           },
                                         ),
                                         IconButton(

@@ -6,16 +6,16 @@ class LineaPedido {
 
   LineaPedido({required this.plato, required this.cantidad});
 
-  factory LineaPedido.fromMap(Map<String, Object?> mapa) {
+  factory LineaPedido.fromMap(Map<String, dynamic> map) {
     return LineaPedido(
-      plato: Plato.fromMap(mapa['plato'] as Map<String, Object?>),
-      cantidad: mapa['cantidad'] as int,
+      plato: Plato.fromMap(map),
+      cantidad: map['cantidad'] as int,
     );
   }
 
-  Map<String, Object?> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      'idPlato': plato.idPlato, // Usamos idPlato, no el objeto completo
+      'idPlato': plato.idPlato,
       'cantidad': cantidad,
     };
   }
