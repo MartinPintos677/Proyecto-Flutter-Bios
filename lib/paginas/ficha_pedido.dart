@@ -33,14 +33,56 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
+    const Color greenColor = Color.fromARGB(255, 44, 164, 50);
     const Color cardColor = Colors.white;
-    const Color highlightColor = Color.fromARGB(255, 44, 164, 50);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Ficha del Pedido #${widget.pedido.idPedido}'),
-        backgroundColor: primaryColor,
-        elevation: 0,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: primaryColor,
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                Text(
+                  'Ficha del Pedido #${widget.pedido.idPedido}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/');
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        'assets/img/logo.jpg',
+                        width: 50,
+                        height: 45,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -48,7 +90,6 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Información del Pedido
               _buildSectionTitle('Información del Pedido'),
               Card(
                 elevation: 2,
@@ -77,10 +118,7 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Platos del Pedido
               _buildSectionTitle('Platos del Pedido'),
               _lineasPedido.isEmpty
                   ? const Center(child: CircularProgressIndicator())
@@ -90,7 +128,7 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
                       itemCount: _lineasPedido.length,
                       itemBuilder: (context, index) {
                         final linea = _lineasPedido[index];
-                        return _buildPlatoCard(linea, highlightColor);
+                        return _buildPlatoCard(linea, greenColor);
                       },
                     ),
             ],
