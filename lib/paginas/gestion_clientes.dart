@@ -230,7 +230,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
                 mensaje = "Cliente eliminado con éxito";
 
                 _cargarClientes();
-              } on Exception catch (e) {
+              } on Exception {
                 mensaje = 'No se puede eliminar, tiene un Pedido asociado';
               }
 

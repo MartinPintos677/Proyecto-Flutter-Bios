@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:formulario_basico/daos/dao_pedidos.dart';
 import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
-import 'package:formulario_basico/paginas/agregar_pedidos.dart';
 
 class PantallaInicial extends StatefulWidget {
   const PantallaInicial({super.key});
@@ -58,12 +57,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
   }
 
   void _agregarPedido(BuildContext context) async {
-    final bool? result = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (context) => const PantallaAgregarPedido()),
-    );
+    final resultado = await Navigator.of(context).pushNamed('/agregar_pedidos');
 
-    if (result != null && result) {
+    if (resultado != null && resultado == true) {
       _cargarPedidos(); // Recargar la lista si se agregó un pedido
     }
   }
@@ -286,8 +282,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           icon: const Icon(Icons.edit,
                                               color: Colors.black),
                                           onPressed: () {
-                                            print(
-                                                'Editar pedido ${pedido.idPedido}');
+                                            Navigator.pushNamed(context,'/agregar_pedidos',arguments:pedido,);
                                           },
                                         ),
                                         IconButton(
@@ -315,8 +310,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _agregarPedido(context),
         backgroundColor: greenColor,
-        child: const Icon(Icons.add),
         tooltip: 'Nuevo Pedido',
+        child: const Icon(Icons.add), 
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

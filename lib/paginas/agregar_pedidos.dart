@@ -7,6 +7,8 @@ import 'package:formulario_basico/dominio/clientes.dart';
 import 'package:formulario_basico/daos/dao_pedidos.dart';
 import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:formulario_basico/daos/dao_platos.dart';
+import 'package:formulario_basico/paginas/paginas.dart';
+import 'package:intl/intl.dart';
 
 class PantallaAgregarPedido extends StatefulWidget {
   const PantallaAgregarPedido({super.key});
@@ -17,52 +19,89 @@ class PantallaAgregarPedido extends StatefulWidget {
 
 class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
-  String? _cedulaCliente;
-  List<int> _platosSeleccionados = [];
-  String _observaciones = '';
-  double _importeTotal = 0.0;
+
+
+  Pedido? _pedido;
+  late int? _idPedido;
   DateTime _fechaHoraRealizacion = DateTime.now();
-  String _estadoEntrega = 'Pendiente';
+  String? _cedulaCliente;
+  late String? _observaciones = '';
+  double _importeTotal = 0.0;
+  late String _estadoEntrega;
+  late bool _cobrado;
+
+  final List<int> _platosSeleccionados = [];
   List<Cliente> _clientes = [];
   List<Plato> _platos = [];
-  Map<int, int> _cantidadPlatos = {}; // Mapa para controlar las cantidades
+  List<LineaPedido> _lineasPedido = [];
+
+  List<String> valoresEstado = ["Pendiente","Cancelado","Entregado"];
 
   @override
   void initState() {
     super.initState();
-    _cargarClientes();
-    _cargarPlatos();
+    
   }
 
   // Cargar clientes de la bd
   Future<void> _cargarClientes() async {
-    DaoClientes daoClientes = DaoClientes();
-    final clientes = await daoClientes.getClientes();
-    setState(() {
-      _clientes = clientes;
-    });
+    DaoClientes().getClientes().then((value) {
+      setState(() {
+        _clientes = value;
+      });
+    },);
   }
 
   // Cargar platos activos de la bd
   Future<void> _cargarPlatos() async {
-    DaoPlato daoPlatos = DaoPlato();
-    final platos = await daoPlatos.obtenerPlatos();
-    setState(() {
-      _platos = platos;
+    DaoPlato().obtenerPlatos().then((value) {
+      setState(() {
+      _platos = value;
     });
+    },); 
   }
+  Future<void> _cargarPlatosDePedido() async {
+    DAOLineasPedido().obtenerLineasPorIdPedido(_pedido?.idPedido).then((value) {
+      setState(() {
+      _lineasPedido = value;
+    });
+    },); 
+  }
+
 
   // Calcular el total del pedido
   void _calcularTotal() {
     double total = 0;
-    for (int platoId in _platosSeleccionados) {
-      var plato = _platos.firstWhere((plato) => plato.idPlato == platoId);
-      total += plato.precio *
-          (_cantidadPlatos[platoId] ?? 1); // Multiplicamos por la cantidad
+    for (LineaPedido linea in _lineasPedido) {
+      var plato = _platos.firstWhere((plato) => plato.idPlato == linea.plato.idPlato);
+      total += plato.precio * (linea.cantidad ?? 1); // Multiplicamos por la cantidad
     }
     setState(() {
       _importeTotal = total;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    _pedido = ModalRoute.of(context)?.settings.arguments as Pedido?;
+
+    _idPedido = _pedido?.idPedido;
+    _cedulaCliente = _pedido?.clienteCedula ?? "";
+    _fechaHoraRealizacion = _pedido?.fechaHoraRealizacion ?? DateTime.now();
+    _observaciones = _pedido?.observaciones;
+    _importeTotal = _pedido?.importeTotal ?? 0.0;
+    _cobrado = _pedido?.cobrado ?? false;
+    _estadoEntrega = _pedido?.estadoEntrega ?? "";
+
+    _cargarClientes();
+    if(_pedido != null){
+      _cargarPlatosDePedido();
+      _cargarPlatos();
+    } else {
+      _cargarPlatos();
+    } 
+
+    super.didChangeDependencies();
   }
 
   // Crear el pedido
@@ -72,166 +111,333 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     // Obtener la cédula del cliente seleccionado
     final clienteCedula = _cedulaCliente;
 
-    // Crear las líneas de pedido
-    List<LineaPedido> lineasPedidos = [];
-    for (int platoId in _platosSeleccionados) {
-      // Buscar el plato correspondiente por su id
-      var plato = _platos.firstWhere((plato) => plato.idPlato == platoId);
-
-      // Obtener la cantidad de este plato
-      int cantidad = _cantidadPlatos[platoId] ?? 1;
-
-      // Crear la línea de pedido
-      lineasPedidos.add(LineaPedido(plato: plato, cantidad: cantidad));
-    }
-
     // Crear el objeto Pedido
     Pedido pedido = Pedido(
       idPedido: null,
       fechaHoraRealizacion: _fechaHoraRealizacion,
       observaciones: _observaciones,
       importeTotal: _importeTotal,
-      estadoEntrega: _estadoEntrega,
-      cobrado: false,
+      estadoEntrega: "Pendiente",
+      cobrado: _cobrado,
       clienteCedula: clienteCedula!,
-      lineasPedidos: lineasPedidos,
+      lineasPedidos: _lineasPedido,
     );
-
     // Llamamos al método crearPedido del Dao
-    final idPedido = await db.crearPedido(pedido);
+    await db.crearPedido(pedido);
+    
+    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const PantallaInicial()),);
+  }
 
-    // Después de insertar el Pedido, insertar las líneas de pedido
-    await DAOLineasPedido().agregarLineasPedido(idPedido, lineasPedidos);
+  // Modificar el pedido
+  Future<void> _modificarPedido() async {
+    final db = DaoPedidos();
 
-    // Regresar a la pantalla principal
-    Navigator.pop(context);
+    // Obtener la cédula del cliente seleccionado
+    final clienteCedula = _cedulaCliente;
+
+    // Crear el objeto Pedido
+    Pedido pedido = Pedido(
+      idPedido: _idPedido,
+      fechaHoraRealizacion: _fechaHoraRealizacion,
+      observaciones: _observaciones,
+      importeTotal: _importeTotal,
+      estadoEntrega: _estadoEntrega,
+      cobrado: _cobrado,
+      clienteCedula: clienteCedula!,
+      lineasPedidos: _lineasPedido,
+    );
+    // Llamamos al método crearPedido del Dao
+    await db.modificarPedido(pedido);
+
+    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => const PantallaInicial()),);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agregar Pedido'),
+        title: Text('${_pedido == null ? 'Agregar' : 'Modificar'} Pedido'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          // Hacemos la pantalla desplazable
-          child: Column(
-            children: [
-              // Seleccionar cliente
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Cliente'),
-                value: _cedulaCliente,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _cedulaCliente = newValue;
-                  });
-                },
-                items: _clientes.map<DropdownMenuItem<String>>((cliente) {
-                  return DropdownMenuItem<String>(
-                    value: cliente.cedula,
-                    child: Text(cliente.nombre),
-                  );
-                }).toList(),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, selecciona un cliente';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+        child: Scrollbar(
+          child: SingleChildScrollView(
+            // Hacemos la pantalla desplazable
+            child: Form(
+              key: _claveFormulario,
+              child: Column(
+                children: [
+                  if (_pedido != null) Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Id: $_idPedido',style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),),
+                  ),
+                  if (_pedido != null) const SizedBox(height: 15),
+                  _pedido != null ? Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Fecha: ${DateFormat('dd/MM/yyyy HH:mm').format(_fechaHoraRealizacion)}',style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),),
+                  ) : const SizedBox(height: 2),
+                  if (_pedido != null) const SizedBox(height: 15),
+                  // Seleccionar cliente
+                  _pedido != null ? DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Cliente'),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _cedulaCliente = newValue;
+                      });
+                    },
+                    items: _clientes.map((c) => DropdownMenuItem(
+                        value: c.cedula,
+                        child: Text(c.nombre),
+                      )
+                    ).toList(),
+                    value: _cedulaCliente,
+                    hint: const Text("Seleccionar"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, selecciona un cliente';
+                      }
+                      return null;
+                    },
+                    onSaved: (newValue) {
+                          _cedulaCliente = newValue!;
+                        },
+                  )
+                  :
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Cliente'),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _cedulaCliente = newValue;
+                      });
+                    },
+                    items: _clientes.map((c) => DropdownMenuItem(
+                        value: c.cedula,
+                        child: Text(c.nombre),
+                      )
+                    ).toList(),
+                    hint: const Text("Seleccionar"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, selecciona un cliente';
+                      }
+                      return null;
+                    },
+                    onSaved: (newValue) {
+                          _cedulaCliente = newValue!;
+                        },
+                  ),
+                  const SizedBox(height: 20),
+                        
+                  // Seleccionar platos con su respectiva cantidad
+                  _pedido == null ? const Text('Platos disponibles:') : const Text("Platos del pedido:"),
+                  ..._platos.map((plato) {
+                    // Buscamos si el plato está en lineas_pedido
+                    LineaPedido? lineaPedido = _lineasPedido.firstWhere(
+                      (linea) => linea.plato.idPlato == plato.idPlato,
+                      orElse: () => LineaPedido(plato: plato, cantidad: 0),
+                    );
 
-              // Seleccionar platos con cantidad
-              const Text('Platos disponibles:'),
-              ..._platos.map((plato) {
-                return Row(
-                  children: [
-                    // Checkbox para seleccionar el plato
-                    Checkbox(
-                      value: _platosSeleccionados.contains(plato.idPlato),
-                      onChanged: (bool? value) {
+                    // Verificamos si el plato está seleccionado o no, lo sabemos por su cantidad
+                    bool isSelected = lineaPedido.cantidad > 0;
+
+                    // Si está seleccionado, le ponemos la cantidad, sino cero
+                    int cantidad = isSelected ? lineaPedido.cantidad : 0;
+
+                    return Row(
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              if (value == true) {
+                                // Si se marca, añadimos a _platosSeleccionados y ponemos la cantidad correspondiente
+                                _platosSeleccionados.add(plato.idPlato);
+                                // Lo agregamos a lineas_pedido si no existe
+                                if (_lineasPedido.every((linea) => linea.plato.idPlato != plato.idPlato)) {
+                                  _lineasPedido.add(LineaPedido(plato: plato, cantidad: 1));
+                                }
+                              } else {
+                                // Si se desmarca, eliminamos de _platosSeleccionados y ponemos la cantidad a 0 en lineas_pedido
+                                _platosSeleccionados.remove(plato.idPlato);
+                                _lineasPedido.removeWhere((linea) => linea.plato.idPlato == plato.idPlato);
+                              }
+                              _calcularTotal();
+                            });
+                          },
+                        ),
+                        Text(plato.nombre),
+
+                        // Mostrar la cantidad a la derecha
+                        const Spacer(),
+
+                        // Fila con la que mostrarmos la cantidad
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: isSelected
+                                  ? () {
+                                      setState(() {
+                                        // Disminuimos si es mayor que cero
+                                        var linea = _lineasPedido.firstWhere(
+                                          (linea) => linea.plato.idPlato == plato.idPlato,
+                                          orElse: () => LineaPedido(plato: plato, cantidad: 0),
+                                        );
+                                        if (linea.cantidad > 1) {
+                                          linea.cantidad -= 1;
+                                        }
+                                        _calcularTotal();
+                                      });
+                                    }
+                                  : null, // Deshabilitamos si no está seleccionado
+                            ),
+                            // cantidad del plato
+                            Text('${lineaPedido.cantidad}'),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: isSelected
+                                  ? () {
+                                      setState(() {
+                                        // Aumentamos la cantidad en lineas_pedido
+                                        var linea = _lineasPedido.firstWhere(
+                                          (linea) => linea.plato.idPlato == plato.idPlato,
+                                          orElse: () => LineaPedido(plato: plato, cantidad: 0),
+                                        );
+                                        linea.cantidad += 1;
+                                        _calcularTotal();
+                                      });
+                                    }
+                                  : null, // Deshabilitamos si no está seleccionado
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }),
+                  const SizedBox(height: 20),
+                        
+                  // Observaciones
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Observaciones'),
+                    initialValue: _observaciones,
+                    onChanged: (value) {
+                      setState(() {
+                        _observaciones = value;
+                      });
+                    },
+                    onSaved: (newValue) {
+                      _observaciones = newValue;
+                    },
+                  ),
+                  if(_pedido == null) const SizedBox(height: 20,),
+                  _pedido != null ?
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(labelText: 'Estado'),
+                    value: _estadoEntrega,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _estadoEntrega = newValue!;
+                      });
+                    },
+                    items: valoresEstado.map((v) => DropdownMenuItem(
+                        value: v,
+                        child: Text(v),
+                      )
+                    ).toList(),
+                    hint: const Text("Seleccionar"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, selecciona un Estado de entrega';
+                      }
+                      return null;
+                    },
+                    onSaved: (newValue) {
+                          _estadoEntrega = newValue!;
+                        },
+                  )
+                  : 
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Estado: ${valoresEstado[0]}",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),
+                      ),
+                  ) 
+                  ,
+                  CheckboxListTile(
+                      title: const Text('Cobrado'),
+                      value: _cobrado,
+                      onChanged: (value) {
                         setState(() {
-                          if (value == true) {
-                            _platosSeleccionados.add(plato.idPlato);
-                            _cantidadPlatos[plato.idPlato] =
-                                1; // Inicializa la cantidad en 1
-                          } else {
-                            _platosSeleccionados.remove(plato.idPlato);
-                            _cantidadPlatos.remove(plato
-                                .idPlato); // Eliminar la cantidad si el plato es deseleccionado
-                          }
-                          _calcularTotal(); // Recalcular el total
+                          _cobrado = value!;
                         });
                       },
                     ),
-                    Text(plato.nombre),
-                    // Campo de cantidad
-                    _platosSeleccionados.contains(plato.idPlato)
-                        ? Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: () {
-                                  setState(() {
-                                    if (_cantidadPlatos[plato.idPlato]! > 1) {
-                                      _cantidadPlatos[plato.idPlato] =
-                                          _cantidadPlatos[plato.idPlato]! - 1;
-                                      _calcularTotal(); // Recalcular el total
-                                    }
-                                  });
-                                },
-                              ),
-                              Text(
-                                  '${_cantidadPlatos[plato.idPlato] ?? 1}'), // Muestra la cantidad
-                              IconButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () {
-                                  setState(() {
-                                    _cantidadPlatos[plato.idPlato] =
-                                        (_cantidadPlatos[plato.idPlato] ?? 0) +
-                                            1;
-                                    _calcularTotal(); // Recalcular el total
-                                  });
-                                },
-                              ),
-                            ],
-                          )
-                        : Container(),
-                  ],
-                );
-              }),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
+                        
+                  // Importe total
+                  Text('Importe total: \$${_importeTotal.toStringAsFixed(2)}'),
+                  const SizedBox(height: 20),
+                        
+                  // Botón para crear el pedido
+                  Align(
+                    alignment: Alignment.bottomCenter, // Alinea el botón al final
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_claveFormulario.currentState?.validate() ?? false) {
+                          _claveFormulario.currentState?.save();
 
-              // Observaciones
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Observaciones'),
-                onChanged: (value) {
-                  setState(() {
-                    _observaciones = value;
-                  });
-                },
+                          String mensaje;
+                          try {
+                              if (_pedido == null && _lineasPedido.isNotEmpty) {
+
+                                _crearPedido();
+                                mensaje = 'Pedido ${_pedido == null ? 'agregado' : 'modificado'} con éxito.';
+                                if (context.mounted) Navigator.of(context).pop();
+
+                              } else if (_pedido != null && _lineasPedido.isNotEmpty){
+
+                                _modificarPedido();
+                                mensaje = 'Pedido ${_pedido == null ? 'agregado' : 'modificado'} con éxito.';
+                                if (context.mounted) Navigator.of(context).pop();
+
+                              } else {
+                                mensaje = "Debe seleccionar algún Plato";
+                              }
+
+                              
+                            } on Exception catch (e) {
+                              mensaje = '¡Error! ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
+                            }
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(mensaje, textAlign: TextAlign.center),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: const Color.fromARGB(128, 64, 64, 64),
+                                  shape: const StadiumBorder(),
+                                  duration: const Duration(seconds: 2),
+                                )
+                              );
+                            }
+                        }
+                      },
+                      child: const Text('Guardar Pedido'),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-
-              // Importe total
-              Text('Importe total: \$${_importeTotal.toStringAsFixed(2)}'),
-              const SizedBox(height: 20),
-
-              // Botón para crear el pedido
-              Align(
-                alignment: Alignment.bottomCenter, // Alinea el botón al final
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_claveFormulario.currentState?.validate() ?? false) {
-                      _crearPedido();
-                    }
-                  },
-                  child: const Text('Crear Pedido'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

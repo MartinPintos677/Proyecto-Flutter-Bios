@@ -2,6 +2,7 @@ import 'package:formulario_basico/daos/dao_lineas_pedido.dart';
 import 'package:formulario_basico/dominio/linea_pedido.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
 import 'package:formulario_basico/daos/base_datos.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DaoPedidos {
   static final DaoPedidos _instancia = DaoPedidos._inicializar();
@@ -15,20 +16,53 @@ class DaoPedidos {
   // Método para crear un nuevo pedido
   Future<int> crearPedido(Pedido pedido) async {
     final db = await BaseDatos().obtenerBaseDatos();
+    int idPedido = 0;
 
-    // Insertar el pedido en la tabla "Pedido"
-    final idPedido = await db.insert('Pedido', pedido.toMap());
+    try{
+      // Insertar el pedido en la tabla "Pedido"
+      final idPedido = await db.insert('Pedido', pedido.toMap());
 
-    // Insertar las líneas de pedido
-    for (var linea in pedido.lineasPedidos!) {
-      final lineaMap = linea.toMap();
-      lineaMap['idPedido'] =
-          idPedido; // Asociamos la linea con el id del pedido insertado
-      await db.insert('LineaPedido', lineaMap);
+      // Insertar las líneas de pedido
+      for (var linea in pedido.lineasPedidos!) {
+        final lineaMap = linea.toMap();
+        lineaMap['idPedido'] = idPedido; // Asociamos la linea con el id del pedido insertado
+        await db.insert('LineaPedido', lineaMap);
+      }
+    } on DatabaseException{
+      throw Exception('No se pudo agregar el Pedido.');
     }
 
     return idPedido;
+
   }
+
+  // Método para modificar un pedido
+Future<int> modificarPedido(Pedido pedido) async {
+  final db = await BaseDatos().obtenerBaseDatos();
+
+  int idPedido = pedido.idPedido!;
+  final resultadoPedido = await db.update(
+    'Pedido', 
+    pedido.toMap(), 
+    where: 'idPedido = ?', 
+    whereArgs: [idPedido]
+  );
+
+  // Eliminamos las lineas para despues insertar las nuevas
+  await db.delete(
+    'LineaPedido', 
+    where: 'idPedido = ?', 
+    whereArgs: [idPedido]
+  );
+
+  for (var linea in pedido.lineasPedidos!) {
+    final lineaMap = linea.toMap();
+    lineaMap['idPedido'] = idPedido;
+    await db.insert('LineaPedido', lineaMap);
+  }
+
+  return resultadoPedido; //Devolvemos las lineas afectadas, por las dudas
+}
 
   // Método para obtener todos los pedidos
   Future<List<Pedido>> obtenerPedidos() async {
