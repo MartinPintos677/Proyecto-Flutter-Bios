@@ -18,51 +18,44 @@ class DaoPedidos {
     final db = await BaseDatos().obtenerBaseDatos();
     int idPedido = 0;
 
-    try{
+    try {
       // Insertar el pedido en la tabla "Pedido"
       final idPedido = await db.insert('Pedido', pedido.toMap());
 
       // Insertar las líneas de pedido
       for (var linea in pedido.lineasPedidos!) {
         final lineaMap = linea.toMap();
-        lineaMap['idPedido'] = idPedido; // Asociamos la linea con el id del pedido insertado
+        lineaMap['idPedido'] =
+            idPedido; // Asociamos la linea con el id del pedido insertado
         await db.insert('LineaPedido', lineaMap);
       }
-    } on DatabaseException{
+    } on DatabaseException {
       throw Exception('No se pudo agregar el Pedido.');
     }
 
     return idPedido;
-
   }
 
   // Método para modificar un pedido
-Future<int> modificarPedido(Pedido pedido) async {
-  final db = await BaseDatos().obtenerBaseDatos();
+  Future<int> modificarPedido(Pedido pedido) async {
+    final db = await BaseDatos().obtenerBaseDatos();
 
-  int idPedido = pedido.idPedido!;
-  final resultadoPedido = await db.update(
-    'Pedido', 
-    pedido.toMap(), 
-    where: 'idPedido = ?', 
-    whereArgs: [idPedido]
-  );
+    int idPedido = pedido.idPedido!;
+    final resultadoPedido = await db.update('Pedido', pedido.toMap(),
+        where: 'idPedido = ?', whereArgs: [idPedido]);
 
-  // Eliminamos las lineas para despues insertar las nuevas
-  await db.delete(
-    'LineaPedido', 
-    where: 'idPedido = ?', 
-    whereArgs: [idPedido]
-  );
+    // Eliminamos las lineas para despues insertar las nuevas
+    await db
+        .delete('LineaPedido', where: 'idPedido = ?', whereArgs: [idPedido]);
 
-  for (var linea in pedido.lineasPedidos!) {
-    final lineaMap = linea.toMap();
-    lineaMap['idPedido'] = idPedido;
-    await db.insert('LineaPedido', lineaMap);
+    for (var linea in pedido.lineasPedidos!) {
+      final lineaMap = linea.toMap();
+      lineaMap['idPedido'] = idPedido;
+      await db.insert('LineaPedido', lineaMap);
+    }
+
+    return resultadoPedido; //Devolvemos las lineas afectadas, por las dudas
   }
-
-  return resultadoPedido; //Devolvemos las lineas afectadas, por las dudas
-}
 
   // Método para obtener todos los pedidos
   Future<List<Pedido>> obtenerPedidos() async {
@@ -96,7 +89,8 @@ Future<int> modificarPedido(Pedido pedido) async {
   }
 
   // Método para actualizar el estado de un pedido
-  Future<int> actualizarEstadoEntregaPedido(int idPedido, String nuevoEstado) async {
+  Future<int> actualizarEstadoEntregaPedido(
+      int idPedido, String nuevoEstado) async {
     final db = await BaseDatos().obtenerBaseDatos();
 
     // Actualizamos el estado del pedido en la base de datos
@@ -111,15 +105,15 @@ Future<int> modificarPedido(Pedido pedido) async {
   Future<void> actualizarEstadoCobradoPedido(List<Pedido> pedidos) async {
     final db = await BaseDatos().obtenerBaseDatos();
 
-    for (var pedido in pedidos) { 
-      await db.update( 
-        'Pedido', 
-        {'cobrado': 1}, 
-        where: 'idPedido = ?', 
-        whereArgs: [pedido.idPedido], 
-      ); }
+    for (var pedido in pedidos) {
+      await db.update(
+        'Pedido',
+        {'cobrado': 1},
+        where: 'idPedido = ?',
+        whereArgs: [pedido.idPedido],
+      );
+    }
   }
-
 
   //Metodo para obtener la lista de Pedidos por la cedula del Cliente
   Future<List<Pedido>> obtenerPedidosNoCobradosPorCedula(String cedula) async {
@@ -137,29 +131,52 @@ Future<int> modificarPedido(Pedido pedido) async {
     });
   }
 
-  Future<Pedido> obtenerPedidoConLineas(int idPedido) async { final db = await BaseDatos().obtenerBaseDatos(); // Obtener el pedido por su ID 
-  final List<Map<String, dynamic>> maps = await db.query( 
-    'Pedido', 
-    where: 'idPedido = ?', 
-    whereArgs: [idPedido], 
-  ); 
-    if (maps.isEmpty) { 
-      throw Exception('Pedido no encontrado'); 
+  Future<Pedido> obtenerPedidoConLineas(int idPedido) async {
+    final db =
+        await BaseDatos().obtenerBaseDatos(); // Obtener el pedido por su ID
+    final List<Map<String, dynamic>> maps = await db.query(
+      'Pedido',
+      where: 'idPedido = ?',
+      whereArgs: [idPedido],
+    );
+    if (maps.isEmpty) {
+      throw Exception('Pedido no encontrado');
+    }
+    final Map<String, dynamic> pedidoMap =
+        maps.first; // Obtener las lineas del pedido
+    final List<LineaPedido> lineasPedidos = await DAOLineasPedido()
+        .obtenerLineasPorIdPedido(idPedido); // Crear el objeto Pedido
+    Pedido pedido =
+        Pedido.fromMap(pedidoMap); // Asignar las lineasPedidos al objeto pedido
+    pedido = Pedido(
+      idPedido: pedido.idPedido,
+      fechaHoraRealizacion: pedido.fechaHoraRealizacion,
+      observaciones: pedido.observaciones,
+      importeTotal: pedido.importeTotal,
+      estadoEntrega: pedido.estadoEntrega,
+      cobrado: pedido.cobrado,
+      clienteCedula: pedido.clienteCedula,
+      lineasPedidos: lineasPedidos,
+    );
+    return pedido;
+  }
 
-    } 
-    final Map<String, dynamic> pedidoMap = maps.first; // Obtener las lineas del pedido 
-    final List<LineaPedido> lineasPedidos = await DAOLineasPedido().obtenerLineasPorIdPedido(idPedido); // Crear el objeto Pedido 
-    Pedido pedido = Pedido.fromMap(pedidoMap); // Asignar las lineasPedidos al objeto pedido 
-    pedido = Pedido( 
-      idPedido: pedido.idPedido, 
-      fechaHoraRealizacion: pedido.fechaHoraRealizacion, 
-      observaciones: pedido.observaciones, 
-      importeTotal: pedido.importeTotal, 
-      estadoEntrega: pedido.estadoEntrega, 
-      cobrado: pedido.cobrado, 
-      clienteCedula: pedido.clienteCedula, 
-      lineasPedidos: lineasPedidos, 
-    ); 
-    return pedido; 
+  // Método para eliminar un pedido
+  Future<void> eliminarPedido(int idPedido) async {
+    final db = await BaseDatos().obtenerBaseDatos();
+
+    // Primero eliminamos las líneas asociadas al pedido
+    await db.delete(
+      'LineaPedido',
+      where: 'idPedido = ?',
+      whereArgs: [idPedido],
+    );
+
+    // Ahora eliminamos el pedido
+    await db.delete(
+      'Pedido',
+      where: 'idPedido = ?',
+      whereArgs: [idPedido],
+    );
   }
 }

@@ -64,6 +64,36 @@ class _PantallaInicialState extends State<PantallaInicial> {
     }
   }
 
+  Future<bool> _mostrarDialogoConfirmacion(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Confirmar eliminación'),
+              content: const Text(
+                  '¿Estás seguro de que deseas eliminar este pedido?'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancelar'),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // Retorna false cuando se cancela
+                  },
+                ),
+                TextButton(
+                  child: const Text('Eliminar'),
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                        true); // Retorna true cuando se confirma la eliminación
+                  },
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Asegura que el valor por defecto sea false si el diálogo se cierra sin elección
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
@@ -282,15 +312,43 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           icon: const Icon(Icons.edit,
                                               color: Colors.black),
                                           onPressed: () {
-                                            Navigator.pushNamed(context,'/agregar_pedidos',arguments:pedido,);
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/agregar_pedidos',
+                                              arguments: pedido,
+                                            );
                                           },
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.delete,
                                               color: Colors.black),
-                                          onPressed: () {
-                                            print(
-                                                'Eliminar pedido ${pedido.idPedido}');
+                                          onPressed: () async {
+                                            // Confirmación de eliminación
+                                            bool confirmDelete =
+                                                await _mostrarDialogoConfirmacion(
+                                                    context);
+                                            if (confirmDelete) {
+                                              try {
+                                                await _daoPedidos
+                                                    .eliminarPedido(
+                                                        pedido.idPedido!);
+                                                // Recargar los pedidos después de la eliminación
+                                                _cargarPedidos();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          'Pedido eliminado exitosamente')),
+                                                );
+                                              } catch (e) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          'Error al eliminar el pedido')),
+                                                );
+                                              }
+                                            }
                                           },
                                         ),
                                       ],
@@ -311,7 +369,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
         onPressed: () => _agregarPedido(context),
         backgroundColor: greenColor,
         tooltip: 'Nuevo Pedido',
-        child: const Icon(Icons.add), 
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
