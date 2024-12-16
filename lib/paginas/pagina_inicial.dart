@@ -15,6 +15,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
   final DaoClientes _daoClientes = DaoClientes();
   List<Pedido> _pedidos = [];
   List<Pedido> _pedidosFiltrados = [];
+  String _estadoSeleccionado = "Pendiente";
 
   @override
   void initState() {
@@ -25,20 +26,19 @@ class _PantallaInicialState extends State<PantallaInicial> {
   Future<void> _cargarPedidos() async {
     final pedidos = await _daoPedidos.obtenerPedidos();
 
-    // Filtrar solo los pedidos con estado "Pendiente"
-    final pedidosPendientes =
-        pedidos.where((pedido) => pedido.estadoEntrega == "Pendiente").toList();
+    final pedidosFiltrados = pedidos
+        .where((pedido) => pedido.estadoEntrega == _estadoSeleccionado)
+        .toList();
 
-    // Asociar nombre del cliente a cada pedido
-    for (var pedido in pedidosPendientes) {
+    for (var pedido in pedidosFiltrados) {
       final cliente =
           await _daoClientes.getClienteByCedula(pedido.clienteCedula);
-      pedido.clienteNombre = cliente?.nombre ?? "Desconocido"; // Asociar nombre
+      pedido.clienteNombre = cliente?.nombre ?? "Desconocido";
     }
 
     setState(() {
-      _pedidos = pedidosPendientes;
-      _pedidosFiltrados = List.from(pedidosPendientes); // Copia para filtrar
+      _pedidos = pedidosFiltrados;
+      _pedidosFiltrados = List.from(pedidosFiltrados);
     });
   }
 
@@ -56,12 +56,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
     });
   }
 
-  void _agregarPedido(BuildContext context) async {
-    final resultado = await Navigator.of(context).pushNamed('/agregar_pedidos');
-
-    if (resultado != null && resultado == true) {
-      _cargarPedidos(); // Recargar la lista si se agregó un pedido
-    }
+  void _cambiarEstado(String nuevoEstado) {
+    setState(() {
+      _estadoSeleccionado = nuevoEstado;
+      _cargarPedidos();
+    });
   }
 
   Future<bool> _mostrarDialogoConfirmacion(BuildContext context) async {
@@ -94,6 +93,14 @@ class _PantallaInicialState extends State<PantallaInicial> {
         false; // Asegura que el valor por defecto sea false si el diálogo se cierra sin elección
   }
 
+  void _agregarPedido(BuildContext context) async {
+    final resultado = await Navigator.of(context).pushNamed('/agregar_pedidos');
+
+    if (resultado != null && resultado == true) {
+      _cargarPedidos(); // Recargar la lista si se agregó un pedido
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
@@ -121,7 +128,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   },
                 ),
                 const Text(
-                  'Pedidos Pendientes',
+                  'Listado de Pedidos',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -179,7 +186,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Inicio'),
+              title: const Text('Gestión de Pedidos'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/');
@@ -210,24 +217,39 @@ class _PantallaInicialState extends State<PantallaInicial> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: TextField(
-                  cursorColor: Colors.grey[600],
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: 'Buscar por cédula de cliente',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey[600],
-                    ),
+              DropdownButton<String>(
+                value: _estadoSeleccionado,
+                onChanged: (String? nuevoValor) {
+                  if (nuevoValor != null) {
+                    _cambiarEstado(nuevoValor);
+                  }
+                },
+                items: [
+                  {"value": "Pendiente", "label": "Pedidos Pendientes"},
+                  {"value": "Entregado", "label": "Pedidos Entregados"},
+                ].map((estado) {
+                  return DropdownMenuItem<String>(
+                    value: estado["value"],
+                    child: Text(estado["label"]!),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                cursorColor: Colors.grey[600],
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  labelText: 'Buscar por cédula de cliente',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  onChanged: (value) => _filtrarPedidos(value),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey[600],
+                  ),
                 ),
+                onChanged: (value) => _filtrarPedidos(value),
               ),
               const SizedBox(height: 10),
               Expanded(
@@ -235,7 +257,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                   padding: const EdgeInsets.only(bottom: 80.0),
                   child: _pedidosFiltrados.isEmpty
                       ? const Center(
-                          child: Text('No hay pedidos pendientes disponibles'),
+                          child: Text('No hay pedidos disponibles'),
                         )
                       : ListView.builder(
                           itemCount: _pedidosFiltrados.length,
@@ -302,9 +324,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                           onPressed: () {
                                             Navigator.pushNamed(
                                               context,
-                                              '/ficha_pedido', // Navega a la ficha de pedido
-                                              arguments:
-                                                  pedido, // Pasa el objeto pedido como argumento
+                                              '/ficha_pedido',
+                                              arguments: pedido,
                                             );
                                           },
                                         ),
