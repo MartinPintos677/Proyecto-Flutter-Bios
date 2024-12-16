@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
 import 'package:formulario_basico/daos/dao_lineas_pedido.dart';
 import 'package:formulario_basico/dominio/linea_pedido.dart';
+import 'package:intl/intl.dart';
 
 class PantallaFichaPedido extends StatefulWidget {
   final Pedido pedido;
@@ -106,10 +107,10 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
                           widget.pedido.clienteNombre ?? "Desconocido"),
                       _buildInfoRow('Cédula:', widget.pedido.clienteCedula),
                       _buildInfoRow(
-                          'Fecha del Pedido:',
-                          widget.pedido.fechaHoraRealizacion
-                              .toString()
-                              .split('.')[0]),
+                        'Fecha del Pedido:',
+                        DateFormat('dd-MM-yyyy HH:mm')
+                            .format(widget.pedido.fechaHoraRealizacion),
+                      ),
                       _buildInfoRow('Importe Total:',
                           '\$${widget.pedido.importeTotal.toStringAsFixed(2)}'),
                       _buildInfoRow('Observaciones:',

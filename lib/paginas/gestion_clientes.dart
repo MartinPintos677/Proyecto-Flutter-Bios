@@ -219,7 +219,8 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text("Eliminar Cliente"),
-        content: Text("Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
+        content: Text(
+            "Confirma que desea eliminar el Cliente con cédula: ${cliente.cedula}"),
         actions: [
           TextButton(
             onPressed: () async {
