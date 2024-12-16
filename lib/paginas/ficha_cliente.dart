@@ -8,18 +8,12 @@ class PantallaFichaCliente extends StatefulWidget {
 
   @override
   State<PantallaFichaCliente> createState() => _PantallaFichaClienteState();
-
-
 }
 
 class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
-
-
   Cliente? cliente;
   List<Pedido> pedidos = [];
   double importeTotal = 0;
-
-
 
   @override
   void didChangeDependencies() {
@@ -30,13 +24,14 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
   }
 
   Future<void> _cargarPedidos() async {
-    final _pedidos = await DaoPedidos().obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
-    setState((){ 
-    pedidos = List.from(_pedidos);
-    for(Pedido p in pedidos){
-      importeTotal = importeTotal + p.importeTotal;
-    }
-  });
+    final _pedidos =
+        await DaoPedidos().obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
+    setState(() {
+      pedidos = List.from(_pedidos);
+      for (Pedido p in pedidos) {
+        importeTotal = importeTotal + p.importeTotal;
+      }
+    });
   }
 
   @override
@@ -60,12 +55,18 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
                     Navigator.pop(context);
                   },
                 ),
-                Text(
-                  'Ficha de ${cliente!.nombre}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                Flexible(
+                  // Permite que el texto administre el ancho
+                  child: Text(
+                    'Ficha de ${cliente!.nombre}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
                   ),
                 ),
                 MouseRegion(
@@ -103,64 +104,70 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: pedidos.isEmpty 
-                ? const Text("No hay Pedidos Pendientes de pago", textAlign: TextAlign.center,) 
-                : ListView.builder(
-                itemCount: pedidos.length,
-                itemBuilder: (context, index) {
-                  final pedido = pedidos[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              child: pedidos.isEmpty
+                  ? const Text(
+                      "No hay Pedidos Pendientes de pago",
+                      textAlign: TextAlign.center,
+                    )
+                  : ListView.builder(
+                      itemCount: pedidos.length,
+                      itemBuilder: (context, index) {
+                        final pedido = pedidos[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Colors.red,
+                              child: Icon(
+                                Icons.warning,
+                                color: Colors.white,
+                              ),
+                            ),
+                            title: Text(
+                              'Pedido #${pedido.idPedido}',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text('Importe: \$${pedido.importeTotal}'),
+                          ),
+                        );
+                      },
                     ),
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.red,
-                        child: Icon(
-                          Icons.warning,
-                          color: Colors.white,
-                        ),
-                      ),
-                      title: Text(
-                        'Pedido #${pedido.idPedido}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text('Importe: \$${pedido.importeTotal}'),
-                    ),
-                  );
-                },
-              ),
             ),
             const SizedBox(height: 20),
-            if(pedidos.isNotEmpty) Text(
-              'Total Adeudado: \$$importeTotal',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 20),
-            if(pedidos.isNotEmpty)Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  DaoPedidos().actualizarEstadoCobradoPedido(pedidos);
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Todos los pedidos han sido abonados'),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: greenColor,
-                  foregroundColor: Colors.white,
+            if (pedidos.isNotEmpty)
+              Text(
+                'Total Adeudado: \$$importeTotal',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.red,
                 ),
-                icon: const Icon(Icons.check), // Ícono de check
-                label: const Text('Marcar como Abonados'),
               ),
-            ),
+            const SizedBox(height: 20),
+            if (pedidos.isNotEmpty)
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    DaoPedidos().actualizarEstadoCobradoPedido(pedidos);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Todos los pedidos han sido abonados'),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: greenColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: const Icon(Icons.check), // Ícono de check
+                  label: const Text('Marcar como Abonados'),
+                ),
+              ),
           ],
         ),
       ),

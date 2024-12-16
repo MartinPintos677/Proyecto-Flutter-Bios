@@ -31,12 +31,37 @@ class PantallaFichaPlato extends StatelessWidget {
                     Navigator.pop(context);
                   },
                 ),
-                Text(
-                  'Ficha de ${plato.nombre}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                Flexible(
+                  // Permite que el texto administre el ancho
+                  child: Text(
+                    'Ficha de ${plato.nombre}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                ),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/');
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        'assets/img/logo.jpg',
+                        width: 50,
+                        height: 45,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -99,7 +124,6 @@ class PantallaFichaPlato extends StatelessWidget {
 
             // Usar un Column para mostrar los días verticalmente centrados
             Center(
-              // Usamos Center solo para centrar el listado de días
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment
                     .center, // Centrado horizontal de los días
