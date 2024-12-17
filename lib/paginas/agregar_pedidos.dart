@@ -80,7 +80,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       var plato =
           _platos.firstWhere((plato) => plato.idPlato == linea.plato.idPlato);
       total +=
-          plato.precio * (linea.cantidad ?? 1); // Multiplicamos por la cantidad
+          plato.precio * (linea.cantidad); // Multiplicamos por la cantidad
     }
     setState(() {
       _importeTotal = total;
@@ -319,13 +319,14 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                     // Verificamos si el plato está seleccionado o no, lo sabemos por su cantidad
                     bool isSelected = lineaPedido.cantidad > 0;
 
-                    // Si está seleccionado, le ponemos la cantidad, sino cero
-                    int cantidad = isSelected ? lineaPedido.cantidad : 0;
-
                     return Row(
                       children: [
                         Checkbox(
                           value: isSelected,
+                          activeColor: Colors.green,
+                          checkColor: Colors.white,
+                          side: const BorderSide(color: Colors.green),
+                          
                           onChanged: (bool? value) {
                             setState(() {
                               if (value == true) {
@@ -347,7 +348,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                             });
                           },
                         ),
-                        Text(plato.nombre),
+                        Text(plato.nombre, style: const TextStyle(color: Colors.black),),
 
                         // Mostrar la cantidad a la derecha
                         const Spacer(),
@@ -406,8 +407,16 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
 
                   // Observaciones
                   TextFormField(
+                    cursorColor: Colors.green,
                     decoration:
-                        const InputDecoration(labelText: 'Observaciones'),
+                        InputDecoration(
+                          labelText: 'Observaciones',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                     initialValue: _observaciones,
                     onChanged: (value) {
                       setState(() {

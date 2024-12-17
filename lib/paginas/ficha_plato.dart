@@ -116,9 +116,9 @@ class PantallaFichaPlato extends StatelessWidget {
             const SizedBox(height: 10),
 
             // Mostrar los días disponibles
-            Text(
+            const Text(
               'Días Disponibles:',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 5),
 
@@ -133,15 +133,6 @@ class PantallaFichaPlato extends StatelessWidget {
                     style: const TextStyle(fontSize: 16),
                   );
                 }).toList(),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-            Text(
-              'Estado: ${plato.activo ? "Activo" : "Inactivo"}',
-              style: TextStyle(
-                fontSize: 16,
-                color: plato.activo ? Colors.green : Colors.red,
               ),
             ),
           ],

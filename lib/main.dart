@@ -30,7 +30,32 @@ class Aplicacion extends StatelessWidget {
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color.fromARGB(255, 44, 164, 50),
-          foregroundColor: Colors.white, // Ícono blanco
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 44, 164, 50), 
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          floatingLabelStyle: TextStyle(color: Colors.green),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey, 
+              width: 2.0,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.green,
+              width: 2.0,
+            ),
+          ),
         ),
       ),
       initialRoute: '/', // Ruta inicial

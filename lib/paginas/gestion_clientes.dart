@@ -99,6 +99,7 @@ class _PantallaGestionClientesState extends State<PantallaGestionClientes> {
         child: Column(
           children: [
             TextField(
+              cursorColor: Colors.green,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,

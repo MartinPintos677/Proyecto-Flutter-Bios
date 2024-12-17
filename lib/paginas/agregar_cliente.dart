@@ -97,6 +97,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                 children: [
                   // Campo para la cédula
                   TextFormField(
+                    cursorColor: Colors.green,
                     enabled: _cliente != null ? false : true,
                     decoration: InputDecoration(
                       labelText: 'Cédula',
@@ -124,6 +125,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                         
                   // Campo para el nombre
                   TextFormField(
+                    cursorColor: Colors.green,
                     decoration: InputDecoration(
                       labelText: 'Nombre',
                       border: OutlineInputBorder(
@@ -150,6 +152,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                         
                   // Campo para la dirección
                   TextFormField(
+                    cursorColor: Colors.green,
                     decoration: InputDecoration(
                       labelText: 'Dirección',
                       border: OutlineInputBorder(
@@ -176,6 +179,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                         
                   // Campo para el teléfono
                   TextFormField(
+                    cursorColor: Colors.green,
                     decoration: InputDecoration(
                       labelText: 'Teléfono',
                       border: OutlineInputBorder(

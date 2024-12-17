@@ -225,6 +225,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
               children: [
                 // Campo de Nombre
                 TextFormField(
+                  cursorColor: Colors.green,
                   initialValue: _nombre,
                   decoration: InputDecoration(
                     labelText: 'Nombre del Plato',
@@ -243,6 +244,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
 
                 // Campo de Precio
                 TextFormField(
+                  cursorColor: Colors.green,
                   initialValue: _precio.toString(),
                   decoration: InputDecoration(
                     labelText: 'Precio',
@@ -290,6 +292,9 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                 Column(
                   children: _diasSemana.asMap().entries.map((entry) {
                     return CheckboxListTile(
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      side: const BorderSide(color: Colors.green),
                       title: Text(entry.value),
                       value: _diasSeleccionados[entry.key],
                       onChanged: (bool? value) {

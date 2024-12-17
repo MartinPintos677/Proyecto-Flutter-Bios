@@ -236,7 +236,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
               ),
               const SizedBox(height: 8),
               TextField(
-                cursorColor: Colors.grey[600],
+                cursorColor: Colors.green,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,

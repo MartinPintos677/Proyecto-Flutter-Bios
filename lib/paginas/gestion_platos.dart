@@ -183,6 +183,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
           children: [
             // Barra de búsqueda
             TextField(
+              cursorColor: Colors.green,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
