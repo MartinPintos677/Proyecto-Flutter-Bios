@@ -51,9 +51,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
         _pedidosFiltrados = _pedidos;
       } else {
         _pedidosFiltrados = _pedidos
-            .where((pedido) => pedido.clienteCedula
-                .toLowerCase()
-                .contains(query.toLowerCase()))
+            .where((pedido) =>
+                (pedido.clienteCedula.toLowerCase())
+                    .contains(query.toLowerCase()) ||
+                (pedido.clienteNombre?.toLowerCase() ?? "")
+                    .contains(query.toLowerCase()))
             .toList();
       }
     });
@@ -250,7 +252,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  labelText: 'Buscar por cédula de cliente',
+                  labelText: 'Buscar por cédula o nombre de cliente',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
