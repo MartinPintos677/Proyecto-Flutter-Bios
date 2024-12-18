@@ -28,7 +28,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
     final pedidos = await _daoPedidos.obtenerPedidos();
 
     final pedidosFiltrados = pedidos
-        .where((pedido) => pedido.estadoEntrega == _estadoSeleccionado)
+        .where((pedido) => _estadoSeleccionado == "Pendiente"
+            ? pedido.estadoEntrega == _estadoSeleccionado
+            : true) // Muestra todos los pedidos si no es Pendiente
         .toList();
 
     for (var pedido in pedidosFiltrados) {
@@ -234,7 +236,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
                 },
                 items: [
                   {"value": "Pendiente", "label": "Pedidos Pendientes"},
-                  {"value": "Entregado", "label": "Pedidos Entregados"},
+                  {"value": "Todos", "label": "Todos los Pedidos"},
                 ].map((estado) {
                   return DropdownMenuItem<String>(
                     value: estado["value"],
