@@ -248,7 +248,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                             ),
                           ),
                         )
-                      : const SizedBox(height: 2),
+                      : const SizedBox(height: 10),
                   if (_pedido != null) const SizedBox(height: 15),
                   // Seleccionar cliente
                   _pedido != null
@@ -427,10 +427,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                       _observaciones = newValue;
                     },
                   ),
-                  if (_pedido == null)
-                    const SizedBox(
-                      height: 20,
-                    ),
+                  const SizedBox(height: 20,),
                   _pedido != null
                       ? DropdownButtonFormField<String>(
                           decoration:

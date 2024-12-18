@@ -187,7 +187,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Gestión de Pedidos'),
+              title: const Text('Página Inicial'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/');
