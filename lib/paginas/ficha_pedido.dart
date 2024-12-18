@@ -26,8 +26,16 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
   Future<void> _cargarLineasPedido() async {
     final lineas =
         await _daoLineasPedido.obtenerLineasPorIdPedido(widget.pedido.idPedido);
+
+    double totalCalculado = 0.0;
+
+    for (var linea in lineas) {
+      totalCalculado += linea.cantidad * linea.plato.precio;
+    }
+
     setState(() {
       _lineasPedido = lineas;
+      widget.pedido.importeTotal = totalCalculado; // Actualizamos el total
     });
   }
 

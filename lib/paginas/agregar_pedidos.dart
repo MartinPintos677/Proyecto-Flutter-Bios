@@ -79,8 +79,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     for (LineaPedido linea in _lineasPedido) {
       var plato =
           _platos.firstWhere((plato) => plato.idPlato == linea.plato.idPlato);
-      total +=
-          plato.precio * (linea.cantidad); // Multiplicamos por la cantidad
+      total += plato.precio * (linea.cantidad); // Multiplicamos por la cantidad
     }
     setState(() {
       _importeTotal = total;
@@ -89,25 +88,50 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _cargarClientes(); // Cargamos la lista de clientes siempre
+
     _pedido = ModalRoute.of(context)?.settings.arguments as Pedido?;
 
-    _idPedido = _pedido?.idPedido;
-    _cedulaCliente = _pedido?.clienteCedula ?? "";
-    _fechaHoraRealizacion = _pedido?.fechaHoraRealizacion ?? DateTime.now();
-    _observaciones = _pedido?.observaciones;
-    _importeTotal = _pedido?.importeTotal ?? 0.0;
-    _cobrado = _pedido?.cobrado ?? false;
-    _estadoEntrega = _pedido?.estadoEntrega ?? "";
-
-    _cargarClientes();
-    if (_pedido != null) {
-      _cargarPlatosDePedido();
-      _cargarPlatos();
+    if (_pedido != null && _pedido!.idPedido != null) {
+      // Si el idPedido no es null, cargamos el pedido actualizado
+      _cargarPedidoActualizado(_pedido!.idPedido!);
     } else {
+      // Si estamos agregando, inicializamos los valores por defecto
+      setState(() {
+        _idPedido = null;
+        _cedulaCliente = null;
+        _fechaHoraRealizacion = DateTime.now();
+        _observaciones = '';
+        _importeTotal = 0.0;
+        _cobrado = false; // Valor predeterminado
+        _estadoEntrega = "Pendiente"; // Valor predeterminado
+      });
+
+      // Cargamos los platos disponibles para el nuevo pedido
       _cargarPlatos();
     }
+  }
 
-    super.didChangeDependencies();
+  Future<void> _cargarPedidoActualizado(int idPedido) async {
+    final pedidoActualizado = await DaoPedidos().obtenerPedidoPorId(idPedido);
+
+    if (pedidoActualizado != null) {
+      setState(() {
+        _idPedido = pedidoActualizado.idPedido ?? 0; // Asignar 0 si es null
+        _cedulaCliente = pedidoActualizado.clienteCedula;
+        _fechaHoraRealizacion = pedidoActualizado.fechaHoraRealizacion;
+        _observaciones = pedidoActualizado.observaciones ?? "";
+        _importeTotal = pedidoActualizado.importeTotal;
+        _cobrado = pedidoActualizado.cobrado;
+        _estadoEntrega = pedidoActualizado.estadoEntrega;
+      });
+
+      // Cargar platos y líneas del pedido
+      _cargarPlatosDePedido();
+      _cargarPlatos();
+    }
   }
 
   // Crear el pedido
@@ -158,9 +182,9 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     // Llamamos al método crearPedido del Dao
     await db.modificarPedido(pedido);
 
-    Navigator.pushReplacement(
-      context,
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const PantallaInicial()),
+      (Route<dynamic> route) => false, // Elimina todas las rutas anteriores
     );
   }
 
@@ -326,7 +350,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           activeColor: Colors.green,
                           checkColor: Colors.white,
                           side: const BorderSide(color: Colors.green),
-                          
                           onChanged: (bool? value) {
                             setState(() {
                               if (value == true) {
@@ -348,7 +371,10 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                             });
                           },
                         ),
-                        Text(plato.nombre, style: const TextStyle(color: Colors.black),),
+                        Text(
+                          plato.nombre,
+                          style: const TextStyle(color: Colors.black),
+                        ),
 
                         // Mostrar la cantidad a la derecha
                         const Spacer(),
@@ -408,15 +434,14 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                   // Observaciones
                   TextFormField(
                     cursorColor: Colors.green,
-                    decoration:
-                        InputDecoration(
-                          labelText: 'Observaciones',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                    decoration: InputDecoration(
+                      labelText: 'Observaciones',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     initialValue: _observaciones,
                     onChanged: (value) {
                       setState(() {
@@ -427,7 +452,9 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                       _observaciones = newValue;
                     },
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   _pedido != null
                       ? DropdownButtonFormField<String>(
                           decoration:

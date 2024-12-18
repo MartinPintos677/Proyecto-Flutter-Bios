@@ -105,31 +105,35 @@ class BaseDatos {
         await db.execute('''
           INSERT INTO Pedido (cedula, cobrado, fechaHoraRealizacion, observaciones, importeTotal, estadoEntrega)
           VALUES
-            ('12345678', 0, '2024-12-01 10:00:00', 'Sin observaciones', 500.00, 'Pendiente'),
-            ('12345678', 1, '2024-12-01 10:30:00', 'Pago realizado', 400.00, 'Pendiente'),
-            ('12345678', 0, '2024-12-02 11:00:00', 'Entrega urgente', 300.00, 'Pendiente'),
-            ('87654321', 1, '2024-12-03 12:00:00', NULL, 200.00, 'Entregado'),
-            ('11223344', 0, '2024-12-04 14:00:00', 'Sin observaciones', 150.00, 'Pendiente'),
-            ('34567890', 1, '2024-12-05 15:00:00', NULL, 600.00, 'Entregado'),
-            ('98765432', 0, '2024-12-06 16:00:00', 'Requiere confirmación', 800.00, 'Pendiente'),
-            ('45678901', 0, '2024-12-07 18:00:00', 'Entrega nocturna', 350.00, 'Pendiente'),
-            ('23456789', 1, '2024-12-08 19:00:00', NULL, 550.00, 'Entregado'),
-            ('56789012', 0, '2024-12-09 20:00:00', 'Cliente habitual', 700.00, 'Pendiente');
+            ('12345678', 0, '2024-12-01 10:00:00', 'Sin observaciones', 400.00, 'Pendiente'),
+            ('12345678', 1, '2024-12-01 10:30:00', 'Pago realizado', 780.00, 'Pendiente'),
+            ('12345678', 0, '2024-12-02 11:00:00', 'Entrega urgente', 500.00, 'Pendiente'),
+            ('87654321', 1, '2024-12-03 12:00:00', NULL, 220.00, 'Entregado'),
+            ('11223344', 0, '2024-12-04 14:00:00', 'Sin observaciones', 120.00, 'Pendiente'),
+            ('34567890', 1, '2024-12-05 15:00:00', NULL, 260.00, 'Entregado'),
+            ('98765432', 0, '2024-12-06 16:00:00', 'Requiere confirmación', 180.00, 'Pendiente'),
+            ('45678901', 0, '2024-12-07 18:00:00', 'Entrega nocturna', 270.00, 'Pendiente'),
+            ('23456789', 1, '2024-12-08 19:00:00', NULL, 500.00, 'Entregado'),
+            ('56789012', 0, '2024-12-09 20:00:00', 'Cliente habitual', 1190.00, 'Pendiente');
         ''');
 
         await db.execute('''
           INSERT INTO LineaPedido (idPedido, idPlato, cantidad)
           VALUES
-            (1, 1, 2),
-            (1, 2, 1),
-            (2, 3, 3),
-            (2, 4, 1),
-            (3, 5, 2),
-            (4, 6, 1),
-            (5, 7, 1),
-            (6, 8, 2),
-            (7, 9, 1),
-            (8, 10, 1);
+          (1, 1, 2),
+           (1, 2, 1),
+          (2, 3, 3),
+           (2, 4, 1),
+           (3, 5, 2),
+           (4, 6, 1),
+          (5, 7, 1),
+          (6, 8, 2),
+           (7, 9, 1),
+          (8, 10, 1),
+          (9, 1, 2),
+         (9, 3, 1),
+         (10, 5, 3),
+         (10, 6, 2);
         ''');
         print("Datos de prueba insertados.");
       },
