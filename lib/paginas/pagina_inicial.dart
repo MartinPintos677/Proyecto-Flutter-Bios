@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:formulario_basico/daos/dao_pedidos.dart';
 import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
@@ -206,6 +207,13 @@ class _PantallaInicialState extends State<PantallaInicial> {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/gestion_clientes');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout_outlined),
+              title: const Text('Salir'),
+              onTap: () {
+                SystemNavigator.pop();
               },
             ),
           ],
