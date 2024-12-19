@@ -5,9 +5,8 @@ import 'package:formulario_basico/dominio/linea_pedido.dart';
 import 'package:intl/intl.dart';
 
 class PantallaFichaPedido extends StatefulWidget {
-  final Pedido pedido;
 
-  const PantallaFichaPedido({Key? key, required this.pedido}) : super(key: key);
+  const PantallaFichaPedido({Key? key}) : super(key: key);
 
   @override
   State<PantallaFichaPedido> createState() => _PantallaFichaPedidoState();
@@ -17,15 +16,25 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
   final DAOLineasPedido _daoLineasPedido = DAOLineasPedido();
   List<LineaPedido> _lineasPedido = [];
 
+  
+
   @override
   void initState() {
     super.initState();
-    _cargarLineasPedido();
   }
 
-  Future<void> _cargarLineasPedido() async {
+
+  @override
+  Widget build(BuildContext context) {
+    const Color primaryColor = Colors.black;
+    const Color greenColor = Color.fromARGB(255, 44, 164, 50);
+    const Color cardColor = Colors.white;
+
+    Pedido pedido = ModalRoute.of(context)!.settings.arguments as Pedido;
+
+    Future<void> cargarLineasPedido() async {
     final lineas =
-        await _daoLineasPedido.obtenerLineasPorIdPedido(widget.pedido.idPedido);
+        await _daoLineasPedido.obtenerLineasPorIdPedido(pedido.idPedido);
 
     double totalCalculado = 0.0;
 
@@ -35,15 +44,11 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
 
     setState(() {
       _lineasPedido = lineas;
-      widget.pedido.importeTotal = totalCalculado; // Actualizamos el total
+      pedido.importeTotal = totalCalculado; // Actualizamos el total
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    const Color primaryColor = Colors.black;
-    const Color greenColor = Color.fromARGB(255, 44, 164, 50);
-    const Color cardColor = Colors.white;
+  cargarLineasPedido();
 
     return Scaffold(
       appBar: PreferredSize(
@@ -62,7 +67,7 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
                   },
                 ),
                 Text(
-                  'Ficha del Pedido #${widget.pedido.idPedido}',
+                  'Ficha del Pedido #${pedido.idPedido}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -112,17 +117,17 @@ class _PantallaFichaPedidoState extends State<PantallaFichaPedido> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildInfoRow('Cliente:',
-                          widget.pedido.clienteNombre ?? "Desconocido"),
-                      _buildInfoRow('Cédula:', widget.pedido.clienteCedula),
+                          pedido.clienteNombre ?? "Desconocido"),
+                      _buildInfoRow('Cédula:', pedido.clienteCedula),
                       _buildInfoRow(
                         'Fecha del Pedido:',
                         DateFormat('dd-MM-yyyy HH:mm')
-                            .format(widget.pedido.fechaHoraRealizacion),
+                            .format(pedido.fechaHoraRealizacion),
                       ),
                       _buildInfoRow('Importe Total:',
-                          '\$${widget.pedido.importeTotal.toStringAsFixed(2)}'),
+                          '\$${pedido.importeTotal.toStringAsFixed(2)}'),
                       _buildInfoRow('Observaciones:',
-                          widget.pedido.observaciones ?? "Sin observaciones"),
+                          pedido.observaciones ?? "Sin observaciones"),
                     ],
                   ),
                 ),

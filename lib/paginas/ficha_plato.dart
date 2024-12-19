@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 
 class PantallaFichaPlato extends StatelessWidget {
-  final Plato plato;
 
-  const PantallaFichaPlato({super.key, required this.plato});
+  const PantallaFichaPlato({super.key});
 
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
+
+    Plato plato = ModalRoute.of(context)!.settings.arguments as Plato;
 
     // Convertir los días disponibles (asumiendo que plato.diasDisponibles es un String con días separados por coma)
     List<String> diasDisponiblesList = plato.diasDisponibles

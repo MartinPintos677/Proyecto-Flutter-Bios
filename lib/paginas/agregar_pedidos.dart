@@ -104,7 +104,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
         _cedulaCliente = null;
         _fechaHoraRealizacion = DateTime.now();
         _observaciones = '';
-        _importeTotal = 0.0;
         _cobrado = false; // Valor predeterminado
         _estadoEntrega = "Pendiente"; // Valor predeterminado
       });
@@ -308,6 +307,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           onChanged: (String? newValue) {
                             setState(() {
                               _cedulaCliente = newValue;
+                              _calcularTotal();
                             });
                           },
                           items: _clientes

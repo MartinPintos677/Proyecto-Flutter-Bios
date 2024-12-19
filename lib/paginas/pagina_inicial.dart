@@ -213,13 +213,6 @@ class _PantallaInicialState extends State<PantallaInicial> {
                 Navigator.pushNamed(context, '/gestion_clientes');
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.logout_outlined),
-              title: const Text('Salir'),
-              onTap: () {
-                SystemNavigator.pop();
-              },
-            ),
           ],
         ),
       ),
