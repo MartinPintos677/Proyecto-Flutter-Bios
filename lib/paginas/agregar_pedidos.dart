@@ -520,34 +520,87 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           String mensaje;
                           try {
                             if (_pedido == null && _lineasPedido.isNotEmpty) {
-                              _crearPedido();
-                              mensaje =
-                                  'Pedido ${_pedido == null ? 'agregado' : 'modificado'} con éxito.';
-                              if (context.mounted) Navigator.of(context).pop();
+                              // Crear un nuevo pedido
+                              await _crearPedido();
+
+                              // Mostrar el diálogo modal solo al agregar
+                              if (context.mounted) {
+                                await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Pedido Guardado'),
+                                      content: Text(
+                                        'El importe total del pedido es \$${_importeTotal.toStringAsFixed(2)}.',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Cierra el modal
+                                          },
+                                          child: const Text('Aceptar'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                // Después de cerrar el modal, regresar al listado
+                                Navigator.of(context).pop(
+                                    true); // Regresa con `true` para recargar la lista
+                              }
                             } else if (_pedido != null &&
                                 _lineasPedido.isNotEmpty) {
-                              _modificarPedido();
-                              mensaje =
-                                  'Pedido ${_pedido == null ? 'agregado' : 'modificado'} con éxito.';
-                              if (context.mounted) Navigator.of(context).pop();
+                              // Modificar pedido existente
+                              await _modificarPedido();
+                              mensaje = 'Pedido modificado con éxito.';
+
+                              if (context.mounted) {
+                                // Mostrar SnackBar al modificar
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(mensaje,
+                                      textAlign: TextAlign.center),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor:
+                                      const Color.fromARGB(128, 64, 64, 64),
+                                  shape: const StadiumBorder(),
+                                  duration: const Duration(seconds: 2),
+                                ));
+                              }
                             } else {
                               mensaje = "Debe seleccionar algún Plato";
+
+                              if (context.mounted) {
+                                // Mostrar error
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(mensaje,
+                                      textAlign: TextAlign.center),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.red,
+                                  shape: const StadiumBorder(),
+                                  duration: const Duration(seconds: 2),
+                                ));
+                              }
                             }
                           } on Exception catch (e) {
                             mensaje =
                                 '¡Error! ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
-                          }
 
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content:
-                                  Text(mensaje, textAlign: TextAlign.center),
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor:
-                                  const Color.fromARGB(128, 64, 64, 64),
-                              shape: const StadiumBorder(),
-                              duration: const Duration(seconds: 2),
-                            ));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content:
+                                    Text(mensaje, textAlign: TextAlign.center),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.red,
+                                shape: const StadiumBorder(),
+                                duration: const Duration(seconds: 2),
+                              ));
+                            }
                           }
                         }
                       },
