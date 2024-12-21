@@ -6,7 +6,7 @@ class Pedido {
   String? observaciones;
   double importeTotal;
   String estadoEntrega;
-  bool cobrado;
+  bool? cobrado;
 
   String clienteCedula; // Guardamos solo la cédula
   String? clienteNombre; // Nuevo campo para almacenar el nombre del cliente
@@ -32,7 +32,7 @@ class Pedido {
       observaciones: map['observaciones'] as String?,
       importeTotal: (map['importeTotal'] as num).toDouble(),
       estadoEntrega: map['estadoEntrega'] as String,
-      cobrado: (map['cobrado'] as int) != 0,
+      cobrado: null,
       clienteCedula: map['cedula'] as String,
       clienteNombre: null, // Se asignará después de obtener del DAO de clientes
       lineasPedidos: null, // Cargar líneas por separado si es necesario
@@ -46,7 +46,7 @@ class Pedido {
       'observaciones': observaciones,
       'importeTotal': importeTotal,
       'estadoEntrega': estadoEntrega,
-      'cobrado': cobrado ? 1 : 0,
+      'cobrado': cobrado,
       'cedula': clienteCedula, // Solo la cédula
     };
   }

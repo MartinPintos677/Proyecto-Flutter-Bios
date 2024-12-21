@@ -40,7 +40,7 @@ class BaseDatos {
           CREATE TABLE Pedido (
             idPedido INTEGER PRIMARY KEY AUTOINCREMENT,
             cedula TEXT NOT NULL,
-            cobrado BOOLEAN NOT NULL,
+            cobrado BOOLEAN NULL,
             fechaHoraRealizacion DATETIME NOT NULL,
             observaciones TEXT,
             importeTotal DECIMAL(10, 2) NOT NULL,

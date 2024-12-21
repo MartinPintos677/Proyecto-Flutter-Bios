@@ -27,7 +27,8 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   late String? _observaciones = '';
   double _importeTotal = 0.0;
   late String _estadoEntrega;
-  late bool _cobrado;
+  late bool? _cobrado;
+  bool mostrarCobrado =  false;
 
   final List<int> _platosSeleccionados = [];
   List<Cliente> _clientes = [];
@@ -107,7 +108,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
         _cedulaCliente = null;
         _fechaHoraRealizacion = DateTime.now();
         _observaciones = '';
-        _cobrado = false; // Valor predeterminado
+        _cobrado = null; // Valor predeterminado
         _estadoEntrega = "Pendiente"; // Valor predeterminado
       });
 
@@ -474,6 +475,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           onChanged: (String? newValue) {
                             setState(() {
                               _estadoEntrega = newValue!;
+                              newValue == "Entregado" ? mostrarCobrado = true : mostrarCobrado = false;
                             });
                           },
                           items: valoresEstado
@@ -492,6 +494,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           onSaved: (newValue) {
                             _estadoEntrega = newValue!;
                           },
+                          
                         )
                       : Align(
                           alignment: Alignment.centerLeft,
@@ -503,7 +506,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                             ),
                           ),
                         ),
-                  CheckboxListTile(
+                  if(mostrarCobrado)CheckboxListTile(
                     title: const Text('Cobrado'),
                     value: _cobrado,
                     onChanged: (value) {
