@@ -25,29 +25,6 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     _filtrarPlatosDisponiblesHoy();
   }
 
-/*
-  // Método para obtener el día de hoy en español
-  String obtenerDiaHoyEnEspaniol() {
-    final DateTime now = DateTime.now();
-    // Obtenemos el día en inglés
-    String diaIngles = DateFormat('EEEE', 'en_US').format(now).toLowerCase();
-
-    // Mapa para traducir los días de inglés a español
-    final Map<String, String> diasInglesAEspanol = {
-      'monday': 'lunes',
-      'tuesday': 'martes',
-      'wednesday': 'miércoles',
-      'thursday': 'jueves',
-      'friday': 'viernes',
-      'saturday': 'sábado',
-      'sunday': 'domingo',
-    };
-
-    // Devolvemos el día en español
-    return diasInglesAEspanol[diaIngles] ??
-        ''; // Si no encuentra el día, retorna una cadena vacía
-  }
-*/
   // Método para cargar los platos activos
   Future<void> _cargarPlatos() async {
     final platos = await _daoPlato.obtenerPlatos();
@@ -56,24 +33,6 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
       _platosFiltrados = platos; // Inicialmente, mostrar todos los platos
     });
   }
-
-// Método para filtrar los platos disponibles hoy
-  /* void _filtrarPlatosDisponiblesHoy() {
-    final diaHoy = obtenerDiaHoyEnEspaniol().toLowerCase();
-
-    setState(() {
-      _platosFiltrados = _platos.where((plato) {
-        List<String> diasDisponibles = plato.diasDisponibles
-            .split(',')
-            .map((e) => e.trim().toLowerCase())
-            .toList();
-
-        return diasDisponibles.contains(diaHoy);
-      }).toList();
-      _FiltroPorHoy =
-          true; // Actualizamos el estado para indicar que estamos filtrando por hoy
-    });
-  } */
 
 // Método para mostrar todos los platos
   void _mostrarTodosLosPlatos() {
