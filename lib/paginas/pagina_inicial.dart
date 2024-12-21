@@ -118,6 +118,19 @@ class _PantallaInicialState extends State<PantallaInicial> {
     }
   }
 
+  void mostrarSnackBar(mensaje){
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(
+      content: Text(mensaje,
+          textAlign: TextAlign.center),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor:
+          const Color.fromARGB(128, 64, 64, 64),
+      shape: const StadiumBorder(),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Colors.black;
@@ -352,11 +365,15 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
                                             onPressed: () {
-                                              Navigator.pushNamed(
-                                                context,
-                                                '/agregar_pedidos',
-                                                arguments: pedido,
-                                              );
+                                              if(pedido.fechaHoraRealizacion.day == DateTime.now().day){
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  '/agregar_pedidos',
+                                                  arguments: pedido,
+                                                );
+                                              }else{
+                                                mostrarSnackBar("Los pedidos viejos no se pueden editar");
+                                              }
                                             },
                                           ),
                                           IconButton(
@@ -374,19 +391,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                                           pedido.idPedido!);
                                                   // Recargar los pedidos después de la eliminación
                                                   _cargarPedidos();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                            'Pedido eliminado exitosamente')),
-                                                  );
+                                                  mostrarSnackBar('Pedido eliminado exitosamente');
                                                 } catch (e) {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                            'Error al eliminar el pedido')),
-                                                  );
+                                                  mostrarSnackBar('Error al eliminar el pedido');
                                                 }
                                               }
                                             },

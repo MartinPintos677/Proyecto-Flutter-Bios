@@ -156,11 +156,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     );
     // Llamamos al método crearPedido del Dao
     await db.crearPedido(pedido);
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const PantallaInicial()),
-    );
   }
 
   // Modificar el pedido
@@ -188,6 +183,19 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       MaterialPageRoute(builder: (context) => const PantallaInicial()),
       (Route<dynamic> route) => false, // Elimina todas las rutas anteriores
     );
+  }
+
+  void mostrarSnackBar(mensaje){
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(
+      content: Text(mensaje,
+          textAlign: TextAlign.center),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor:
+          const Color.fromARGB(128, 64, 64, 64),
+      shape: const StadiumBorder(),
+      duration: const Duration(seconds: 2),
+    ));
   }
 
   @override
@@ -540,8 +548,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                                       actions: [
                                         TextButton(
                                           onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Cierra el modal
+                                            Navigator.of(context).pushNamed("/");
                                           },
                                           child: const Text('Aceptar'),
                                         ),
@@ -549,10 +556,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                                     );
                                   },
                                 );
-
-                                // Después de cerrar el modal, regresar al listado
-                                Navigator.of(context).pop(
-                                    true); // Regresa con `true` para recargar la lista
                               }
                             } else if (_pedido != null &&
                                 _lineasPedido.isNotEmpty) {
@@ -561,32 +564,13 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                               mensaje = 'Pedido modificado con éxito.';
 
                               if (context.mounted) {
-                                // Mostrar SnackBar al modificar
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(mensaje,
-                                      textAlign: TextAlign.center),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor:
-                                      const Color.fromARGB(128, 64, 64, 64),
-                                  shape: const StadiumBorder(),
-                                  duration: const Duration(seconds: 2),
-                                ));
+                                mostrarSnackBar(mensaje);
                               }
                             } else {
                               mensaje = "Debe seleccionar algún Plato";
 
                               if (context.mounted) {
-                                // Mostrar error
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(mensaje,
-                                      textAlign: TextAlign.center),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.red,
-                                  shape: const StadiumBorder(),
-                                  duration: const Duration(seconds: 2),
-                                ));
+                                mostrarSnackBar(mensaje);
                               }
                             }
                           } on Exception catch (e) {
@@ -594,15 +578,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                                 '¡Error! ${e.toString().startsWith('Exception: ') ? e.toString().substring(11) : e.toString()}';
 
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content:
-                                    Text(mensaje, textAlign: TextAlign.center),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.red,
-                                shape: const StadiumBorder(),
-                                duration: const Duration(seconds: 2),
-                              ));
+                              mostrarSnackBar(mensaje);
                             }
                           }
                         }
