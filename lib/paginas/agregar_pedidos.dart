@@ -24,8 +24,8 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   late int? _idPedido;
   DateTime _fechaHoraRealizacion = DateTime.now();
   String? _cedulaCliente;
-  late String? _observaciones = '';
-  double _importeTotal = 0.0;
+  late String? _observaciones;
+  late double _importeTotal;
   late String _estadoEntrega;
   late bool? _cobrado;
   bool mostrarCobrado =  false;
@@ -508,7 +508,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                         ),
                   if(mostrarCobrado)CheckboxListTile(
                     title: const Text('Cobrado'),
-                    value: _cobrado,
+                    value: _cobrado == null || _cobrado == false ? false : true,
                     onChanged: (value) {
                       setState(() {
                         _cobrado = value!;
