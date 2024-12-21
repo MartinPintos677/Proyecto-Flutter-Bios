@@ -1,5 +1,6 @@
 import 'package:formulario_basico/daos/base_datos.dart';
 import 'package:formulario_basico/daos/dao_clientes.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 
@@ -77,5 +78,41 @@ class DaoPlato {
     }
 
     return plato;
+  }
+
+  String obtenerDiaHoyEnEspaniol() {
+    final DateTime now = DateTime.now();
+    String diaIngles = DateFormat('EEEE', 'en_US').format(now).toLowerCase();
+
+    final Map<String, String> diasInglesAEspanol = {
+      'monday': 'lunes',
+      'tuesday': 'martes',
+      'wednesday': 'miércoles',
+      'thursday': 'jueves',
+      'friday': 'viernes',
+      'saturday': 'sábado',
+      'sunday': 'domingo',
+    };
+
+    return diasInglesAEspanol[diaIngles] ?? '';
+  }
+
+  Future<List<Plato>> obtenerPlatosDisponiblesHoy() async {
+    // Obtén los platos desde la base de datos (usando el Dao)
+    final platos = await DaoPlato().obtenerPlatos();
+
+    final diaHoy = obtenerDiaHoyEnEspaniol().toLowerCase();
+
+    // Filtramos los platos que están disponibles hoy
+    final platosDisponiblesHoy = platos.where((plato) {
+      List<String> diasDisponibles = plato.diasDisponibles
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .toList();
+
+      return diasDisponibles.contains(diaHoy);
+    }).toList();
+
+    return platosDisponiblesHoy;
   }
 }

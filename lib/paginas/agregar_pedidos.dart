@@ -39,6 +39,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   @override
   void initState() {
     super.initState();
+    _cargarPlatos();
   }
 
   // Cargar clientes de la bd
@@ -52,12 +53,14 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     );
   }
 
-  // Cargar platos activos de la bd
+  // Cargar platos disponibles hoy
   Future<void> _cargarPlatos() async {
-    DaoPlato().obtenerPlatos().then(
+    // Llama al DaoPlato para obtener los platos disponibles hoy
+    DaoPlato().obtenerPlatosDisponiblesHoy().then(
       (value) {
         setState(() {
-          _platos = value;
+          _platos =
+              value; // Actualizamos la lista de platos con los disponibles hoy
         });
       },
     );

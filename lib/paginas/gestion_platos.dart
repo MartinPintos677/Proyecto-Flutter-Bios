@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:formulario_basico/daos/dao_platos.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 import 'package:formulario_basico/paginas/agregar_plato.dart';
-import 'package:intl/intl.dart';
+//import 'package:intl/intl.dart';
 
 class PantallaGestionPlatos extends StatefulWidget {
   const PantallaGestionPlatos({super.key});
@@ -22,8 +22,10 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   void initState() {
     super.initState();
     _cargarPlatos();
+    _filtrarPlatosDisponiblesHoy();
   }
 
+/*
   // Método para obtener el día de hoy en español
   String obtenerDiaHoyEnEspaniol() {
     final DateTime now = DateTime.now();
@@ -45,7 +47,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
     return diasInglesAEspanol[diaIngles] ??
         ''; // Si no encuentra el día, retorna una cadena vacía
   }
-
+*/
   // Método para cargar los platos activos
   Future<void> _cargarPlatos() async {
     final platos = await _daoPlato.obtenerPlatos();
@@ -56,7 +58,7 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
   }
 
 // Método para filtrar los platos disponibles hoy
-  void _filtrarPlatosDisponiblesHoy() {
+  /* void _filtrarPlatosDisponiblesHoy() {
     final diaHoy = obtenerDiaHoyEnEspaniol().toLowerCase();
 
     setState(() {
@@ -71,13 +73,24 @@ class _PantallaGestionPlatosState extends State<PantallaGestionPlatos> {
       _FiltroPorHoy =
           true; // Actualizamos el estado para indicar que estamos filtrando por hoy
     });
-  }
+  } */
 
 // Método para mostrar todos los platos
   void _mostrarTodosLosPlatos() {
     setState(() {
       _platosFiltrados = _platos; // Mostramos todos los platos
       _FiltroPorHoy = false; // Restablecemos el filtro
+    });
+  }
+
+// Método para filtrar los platos disponibles hoy
+  void _filtrarPlatosDisponiblesHoy() {
+    // Llama al método para obtener los platos disponibles hoy
+    DaoPlato().obtenerPlatosDisponiblesHoy().then((platosHoy) {
+      setState(() {
+        _platosFiltrados = platosHoy;
+        _FiltroPorHoy = true;
+      });
     });
   }
 
