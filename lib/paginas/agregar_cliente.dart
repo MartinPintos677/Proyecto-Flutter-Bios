@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:formulario_basico/daos/dao_clientes.dart';
 import 'package:formulario_basico/dominio/clientes.dart';
 
@@ -139,6 +140,10 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     ),
                     initialValue: _nombre,
                     textInputAction: TextInputAction.next,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(
+                          r'^[a-zA-Z0-9\s]+$')), // Filtra caracteres no alfanuméricos
+                    ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'El nombre no debe quedar vacío';
@@ -166,6 +171,10 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     ),
                     initialValue: _direccion,
                     textInputAction: TextInputAction.next,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(
+                          r'^[a-zA-Z0-9\s]+$')), // Filtra caracteres no alfanuméricos
+                    ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'La dirección no debe quedar vacía';
