@@ -106,6 +106,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                       ),
                     ),
                     initialValue: _cedula,
+                    keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
