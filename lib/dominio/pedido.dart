@@ -32,7 +32,7 @@ class Pedido {
       observaciones: map['observaciones'] as String?,
       importeTotal: (map['importeTotal'] as num).toDouble(),
       estadoEntrega: map['estadoEntrega'] as String,
-      cobrado: null,
+      cobrado: map['cobrado'] == null ? null : map['cobrado'] == 1 ? true : map['cobrado'] == 0 ? false : map['cobrado'] as bool?,
       clienteCedula: map['cedula'] as String,
       clienteNombre: null, // Se asignará después de obtener del DAO de clientes
       lineasPedidos: null, // Cargar líneas por separado si es necesario

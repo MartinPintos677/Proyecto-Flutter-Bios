@@ -21,12 +21,12 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
 
   Pedido? _pedido;
-  late int? _idPedido;
+  int? _idPedido;
   DateTime _fechaHoraRealizacion = DateTime.now();
   String? _cedulaCliente;
-  late String? _observaciones;
-  late double _importeTotal;
-  late String _estadoEntrega;
+  String? _observaciones = "";
+  double _importeTotal = 0.0;
+  String _estadoEntrega = "Pendiente";
   late bool? _cobrado;
   bool mostrarCobrado =  false;
 
@@ -99,8 +99,22 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     _pedido = ModalRoute.of(context)?.settings.arguments as Pedido?;
 
     if (_pedido != null && _pedido!.idPedido != null) {
-      // Si el idPedido no es null, cargamos el pedido actualizado
-      _cargarPedidoActualizado(_pedido!.idPedido!);
+      setState(() {
+        _idPedido = _pedido?.idPedido ?? 0; // Asignar 0 si es null
+        _cedulaCliente = _pedido?.clienteCedula;
+        _fechaHoraRealizacion = _pedido!.fechaHoraRealizacion;
+        _observaciones = _pedido?.observaciones ?? "";
+        _importeTotal = _pedido!.importeTotal;
+        _cobrado = _pedido?.cobrado;
+        _estadoEntrega = _pedido!.estadoEntrega;
+
+        if(_pedido!.estadoEntrega == "Entregado"){
+          mostrarCobrado = true;
+        }
+      });
+      // Cargar platos y líneas del pedido
+      _cargarPlatosDePedido();
+      _cargarPlatos();
     } else {
       // Si estamos agregando, inicializamos los valores por defecto
       setState(() {
@@ -113,26 +127,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       });
 
       // Cargamos los platos disponibles para el nuevo pedido
-      _cargarPlatos();
-    }
-  }
-
-  Future<void> _cargarPedidoActualizado(int idPedido) async {
-    final pedidoActualizado = await DaoPedidos().obtenerPedidoPorId(idPedido);
-
-    if (pedidoActualizado != null) {
-      setState(() {
-        _idPedido = pedidoActualizado.idPedido ?? 0; // Asignar 0 si es null
-        _cedulaCliente = pedidoActualizado.clienteCedula;
-        _fechaHoraRealizacion = pedidoActualizado.fechaHoraRealizacion;
-        _observaciones = pedidoActualizado.observaciones ?? "";
-        _importeTotal = pedidoActualizado.importeTotal;
-        _cobrado = pedidoActualizado.cobrado;
-        _estadoEntrega = pedidoActualizado.estadoEntrega;
-      });
-
-      // Cargar platos y líneas del pedido
-      _cargarPlatosDePedido();
       _cargarPlatos();
     }
   }
@@ -493,6 +487,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           },
                           onSaved: (newValue) {
                             _estadoEntrega = newValue!;
+                            newValue == "Entregado" ? mostrarCobrado = true : mostrarCobrado = false;
                           },
                           
                         )
