@@ -28,7 +28,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   double _importeTotal = 0.0;
   String _estadoEntrega = "Pendiente";
   late bool? _cobrado;
-  bool mostrarCobrado =  false;
+  bool mostrarCobrado = false;
 
   final List<int> _platosSeleccionados = [];
   List<Cliente> _clientes = [];
@@ -108,7 +108,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
         _cobrado = _pedido?.cobrado;
         _estadoEntrega = _pedido!.estadoEntrega;
 
-        if(_pedido!.estadoEntrega == "Entregado"){
+        if (_pedido!.estadoEntrega == "Entregado") {
           mostrarCobrado = true;
         }
       });
@@ -171,23 +171,29 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       clienteCedula: clienteCedula!,
       lineasPedidos: _lineasPedido,
     );
-    // Llamamos al método crearPedido del Dao
+
+    // Guardar cambios en la base de datos
     await db.modificarPedido(pedido);
 
+    // Mostrar un mensaje al usuario si corresponde
+    if (_estadoEntrega == "Entregado" &&
+        (_cobrado == null || _cobrado == false)) {
+      mostrarSnackBar(
+          "El pedido fue entregado pero no cobrado. Se reflejará en la deuda del cliente.");
+    }
+
+    // Volver a la pantalla inicial
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const PantallaInicial()),
-      (Route<dynamic> route) => false, // Elimina todas las rutas anteriores
+      (Route<dynamic> route) => false,
     );
   }
 
-  void mostrarSnackBar(mensaje){
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(
-      content: Text(mensaje,
-          textAlign: TextAlign.center),
+  void mostrarSnackBar(mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mensaje, textAlign: TextAlign.center),
       behavior: SnackBarBehavior.floating,
-      backgroundColor:
-          const Color.fromARGB(128, 64, 64, 64),
+      backgroundColor: const Color.fromARGB(128, 64, 64, 64),
       shape: const StadiumBorder(),
       duration: const Duration(seconds: 2),
     ));
@@ -469,7 +475,9 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           onChanged: (String? newValue) {
                             setState(() {
                               _estadoEntrega = newValue!;
-                              newValue == "Entregado" ? mostrarCobrado = true : mostrarCobrado = false;
+                              newValue == "Entregado"
+                                  ? mostrarCobrado = true
+                                  : mostrarCobrado = false;
                             });
                           },
                           items: valoresEstado
@@ -487,9 +495,10 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                           },
                           onSaved: (newValue) {
                             _estadoEntrega = newValue!;
-                            newValue == "Entregado" ? mostrarCobrado = true : mostrarCobrado = false;
+                            newValue == "Entregado"
+                                ? mostrarCobrado = true
+                                : mostrarCobrado = false;
                           },
-                          
                         )
                       : Align(
                           alignment: Alignment.centerLeft,
@@ -501,15 +510,17 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                             ),
                           ),
                         ),
-                  if(mostrarCobrado)CheckboxListTile(
-                    title: const Text('Cobrado'),
-                    value: _cobrado == null || _cobrado == false ? false : true,
-                    onChanged: (value) {
-                      setState(() {
-                        _cobrado = value!;
-                      });
-                    },
-                  ),
+                  if (mostrarCobrado)
+                    CheckboxListTile(
+                      title: const Text('Cobrado'),
+                      value:
+                          _cobrado == null || _cobrado == false ? false : true,
+                      onChanged: (value) {
+                        setState(() {
+                          _cobrado = value!;
+                        });
+                      },
+                    ),
                   const SizedBox(height: 20),
 
                   // Importe total
@@ -546,7 +557,8 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                                       actions: [
                                         TextButton(
                                           onPressed: () {
-                                            Navigator.of(context).pushNamed("/");
+                                            Navigator.of(context)
+                                                .pushNamed("/");
                                           },
                                           child: const Text('Aceptar'),
                                         ),

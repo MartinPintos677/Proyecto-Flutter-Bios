@@ -26,11 +26,10 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
   Future<void> _cargarPedidos() async {
     final _pedidos =
         await DaoPedidos().obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
+
     setState(() {
-      pedidos = List.from(_pedidos);
-      for (Pedido p in pedidos) {
-        importeTotal = importeTotal + p.importeTotal;
-      }
+      pedidos = _pedidos;
+      importeTotal = pedidos.fold(0, (sum, p) => sum + p.importeTotal);
     });
   }
 

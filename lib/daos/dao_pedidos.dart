@@ -40,22 +40,26 @@ class DaoPedidos {
   Future<int> modificarPedido(Pedido pedido) async {
     final db = await BaseDatos().obtenerBaseDatos();
 
-    int idPedido = pedido.idPedido!;
-    final resultadoPedido = await db.update('Pedido', pedido.toMap(),
-        where: 'idPedido = ?', whereArgs: [idPedido]);
+    int resultadoPedido = await db.update(
+      'Pedido',
+      pedido.toMap(),
+      where: 'idPedido = ?',
+      whereArgs: [pedido.idPedido],
+    );
 
-    // Eliminamos las lineas para despues insertar las nuevas
-    await db
-        .delete('LineaPedido', where: 'idPedido = ?', whereArgs: [idPedido]);
+    await db.delete(
+      'LineaPedido',
+      where: 'idPedido = ?',
+      whereArgs: [pedido.idPedido],
+    );
 
     for (var linea in pedido.lineasPedidos!) {
       final lineaMap = linea.toMap();
-      lineaMap['idPedido'] = idPedido;
+      lineaMap['idPedido'] = pedido.idPedido;
       await db.insert('LineaPedido', lineaMap);
     }
 
-
-    return resultadoPedido; //Devolvemos las lineas afectadas, por las dudas
+    return resultadoPedido;
   }
 
   // Método para obtener todos los pedidos
@@ -120,11 +124,10 @@ class DaoPedidos {
   Future<List<Pedido>> obtenerPedidosNoCobradosPorCedula(String cedula) async {
     final db = await BaseDatos().obtenerBaseDatos();
 
-    // Obtenemos el pedido por su ID
     final List<Map<String, dynamic>> maps = await db.query(
       'Pedido',
-      where: 'cedula = ? AND cobrado = ?',
-      whereArgs: [cedula, 0],
+      where: 'cedula = ? AND estadoEntrega = ? AND cobrado = 0',
+      whereArgs: [cedula, 'Entregado'],
     );
 
     return List.generate(maps.length, (i) {
