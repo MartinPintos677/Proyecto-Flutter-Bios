@@ -216,22 +216,39 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                           String mensaje;
 
                           try {
-                            if (_cliente == null) {
-                              await DaoClientes().insertCliente(Cliente(
-                                  cedula: _cedula!,
-                                  nombre: _nombre!,
-                                  direccion: _direccion!,
-                                  telefono: _telefono!));
-                            } else {
-                              await DaoClientes().updateCliente(Cliente(
-                                  cedula: _cedula!,
-                                  nombre: _nombre!,
-                                  direccion: _direccion!,
-                                  telefono: _telefono!));
-                            }
+                            // Verificar si ya existe un cliente con la misma cédula
+                            Cliente? clienteExistente = await DaoClientes()
+                                .getClienteByCedula(_cedula!);
 
-                            mensaje =
-                                'Cliente ${_cliente == null ? 'Agregado' : 'Modificado'} con éxito';
+                            if (clienteExistente != null) {
+                              // Si el cliente ya existe, mostrar mensaje de error
+                              mensaje = 'Ya existe un cliente con esa cédula';
+                            } else {
+                              // Si no existe, proceder con la inserción o actualización
+                              if (_cliente == null) {
+                                // Insertar cliente
+                                await DaoClientes().insertCliente(
+                                  Cliente(
+                                    cedula: _cedula!,
+                                    nombre: _nombre!,
+                                    direccion: _direccion!,
+                                    telefono: _telefono!,
+                                  ),
+                                );
+                                mensaje = 'Cliente agregado con éxito';
+                              } else {
+                                // Actualizar cliente
+                                await DaoClientes().updateCliente(
+                                  Cliente(
+                                    cedula: _cedula!,
+                                    nombre: _nombre!,
+                                    direccion: _direccion!,
+                                    telefono: _telefono!,
+                                  ),
+                                );
+                                mensaje = 'Cliente modificado con éxito';
+                              }
+                            }
 
                             if (context.mounted)
                               Navigator.of(context).pop(true);
