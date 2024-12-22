@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:formulario_basico/daos/dao_platos.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 import 'package:image_picker/image_picker.dart';
@@ -227,6 +228,12 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                 TextFormField(
                   cursorColor: Colors.green,
                   initialValue: _nombre,
+                  inputFormatters: [
+                    // Permite letras, números y espacios
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s]')),
+                    // Deniega caracteres especiales como las comas (',')
+                    FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                  ],
                   decoration: InputDecoration(
                     labelText: 'Nombre del Plato',
                     border: OutlineInputBorder(
