@@ -115,7 +115,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
 
                       // Validar que la cédula tenga 8 caracteres y sea numérica
                       if (value.length != 8) {
-                        return 'La cédula debe tener 8 caracteres';
+                        return 'La cédula debe tener 8 números';
                       }
 
                       if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
