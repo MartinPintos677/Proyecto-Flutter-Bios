@@ -52,9 +52,9 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                   },
                 ),
                 // Título centrado
-                const Text(
-                  'Agregar Cliente',
-                  style: TextStyle(
+                Text(
+                  _cliente == null ? 'Agregar Cliente' : 'Modificar Cliente',
+                  style: const TextStyle(
                     color: Colors.white, // Texto blanco
                     fontWeight: FontWeight.bold,
                     fontSize: 20,

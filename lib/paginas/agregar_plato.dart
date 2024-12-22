@@ -189,9 +189,9 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
                 ),
-                const Text(
-                  'Agregar Plato',
-                  style: TextStyle(
+                Text(
+                  _plato == null ? 'Agregar Plato' : 'Modificar Plato',
+                  style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 20),
