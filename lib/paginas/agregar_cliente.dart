@@ -142,8 +142,11 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     initialValue: _nombre,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(
-                          r'^[a-zA-Z0-9\s]+$')), // Filtra caracteres no alfanuméricos
+                      // Permite letras, números y espacios
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9\s]')),
+                      // Deniega caracteres especiales como las comas (',')
+                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
                     ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -173,8 +176,11 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     initialValue: _direccion,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(
-                          r'^[a-zA-Z0-9\s]+$')), // Filtra caracteres no alfanuméricos
+                      // Permite letras, números y espacios
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9\s]')),
+                      // Deniega caracteres especiales como las comas (',')
+                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
                     ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
