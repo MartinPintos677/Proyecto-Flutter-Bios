@@ -68,7 +68,36 @@ class _PantallaInicialState extends State<PantallaInicial> {
     });
   }
 
-  // Método para mostrar el cuadro de diálogo de confirmación
+// Método para mostrar el cuadro de diálogo de confirmación para eliminar el pedido
+  Future<bool> _mostrarDialogoConfirmacionEliminar(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Eliminar Pedido'),
+              content: const Text(
+                  '¿Estás seguro de que deseas eliminar este pedido?'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('No'),
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // No eliminar
+                  },
+                ),
+                TextButton(
+                  child: const Text('Sí'),
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Confirmar eliminación
+                  },
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  // Método para mostrar el cuadro de diálogo de confirmación salir de la app
   Future<bool> _mostrarDialogoConfirmacion(BuildContext context) async {
     return await showDialog<bool>(
           context: context,
@@ -118,14 +147,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
     }
   }
 
-  void mostrarSnackBar(mensaje){
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(
-      content: Text(mensaje,
-          textAlign: TextAlign.center),
+  void mostrarSnackBar(mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(mensaje, textAlign: TextAlign.center),
       behavior: SnackBarBehavior.floating,
-      backgroundColor:
-          const Color.fromARGB(128, 64, 64, 64),
+      backgroundColor: const Color.fromARGB(128, 64, 64, 64),
       shape: const StadiumBorder(),
       duration: const Duration(seconds: 2),
     ));
@@ -365,14 +391,17 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                             icon: const Icon(Icons.edit,
                                                 color: Colors.black),
                                             onPressed: () {
-                                              if(pedido.fechaHoraRealizacion.day == DateTime.now().day){
+                                              if (pedido.fechaHoraRealizacion
+                                                      .day ==
+                                                  DateTime.now().day) {
                                                 Navigator.pushNamed(
                                                   context,
                                                   '/agregar_pedidos',
                                                   arguments: pedido,
                                                 );
-                                              }else{
-                                                mostrarSnackBar("Los pedidos viejos no se pueden editar");
+                                              } else {
+                                                mostrarSnackBar(
+                                                    "Los pedidos viejos no se pueden editar");
                                               }
                                             },
                                           ),
@@ -380,9 +409,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                             icon: const Icon(Icons.delete,
                                                 color: Colors.black),
                                             onPressed: () async {
-                                              // Confirmación de eliminación
+                                              // Mostrar el cuadro de diálogo de confirmación para eliminar el pedido
                                               bool confirmDelete =
-                                                  await _mostrarDialogoConfirmacion(
+                                                  await _mostrarDialogoConfirmacionEliminar(
                                                       context);
                                               if (confirmDelete) {
                                                 try {
@@ -391,9 +420,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                                           pedido.idPedido!);
                                                   // Recargar los pedidos después de la eliminación
                                                   _cargarPedidos();
-                                                  mostrarSnackBar('Pedido eliminado exitosamente');
+                                                  mostrarSnackBar(
+                                                      'Pedido eliminado exitosamente');
                                                 } catch (e) {
-                                                  mostrarSnackBar('Error al eliminar el pedido');
+                                                  mostrarSnackBar(
+                                                      'Error al eliminar el pedido');
                                                 }
                                               }
                                             },
