@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:formulario_basico/daos/dao_lineas_pedido.dart';
 import 'package:formulario_basico/dominio/platos.dart';
 import 'package:formulario_basico/dominio/pedido.dart';
@@ -455,6 +456,13 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                       ),
                     ),
                     initialValue: _observaciones,
+                    inputFormatters: [
+                      // Permite letras, números y espacios
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9\s]')),
+                      // Deniega caracteres especiales como las comas (',')
+                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                    ],
                     onChanged: (value) {
                       setState(() {
                         _observaciones = value;
