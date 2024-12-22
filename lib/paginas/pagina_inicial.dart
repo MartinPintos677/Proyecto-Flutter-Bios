@@ -68,55 +68,26 @@ class _PantallaInicialState extends State<PantallaInicial> {
     });
   }
 
-// Método para mostrar el cuadro de diálogo de confirmación para eliminar el pedido
-  Future<bool> _mostrarDialogoConfirmacionEliminar(BuildContext context) async {
+// Método para mostrar el cuadro de diálogo de confirmación (para cualquier acción)
+  Future<bool> _mostrarDialogoConfirmacion(
+      BuildContext context, String titulo, String mensaje) async {
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Eliminar Pedido'),
-              content: const Text(
-                  '¿Estás seguro de que deseas eliminar este pedido?'),
+              title: Text(titulo),
+              content: Text(mensaje),
               actions: <Widget>[
                 TextButton(
                   child: const Text('No'),
                   onPressed: () {
-                    Navigator.of(context).pop(false); // No eliminar
+                    Navigator.of(context).pop(false); // Acción negativa
                   },
                 ),
                 TextButton(
                   child: const Text('Sí'),
                   onPressed: () {
-                    Navigator.of(context).pop(true); // Confirmar eliminación
-                  },
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
-  }
-
-  // Método para mostrar el cuadro de diálogo de confirmación salir de la app
-  Future<bool> _mostrarDialogoConfirmacion(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirmar salida'),
-              content: const Text(
-                  '¿Estás seguro de que deseas salir de la aplicación?'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('No'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false); // No salir
-                  },
-                ),
-                TextButton(
-                  child: const Text('Sí'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true); // Confirmar salida
+                    Navigator.of(context).pop(true); // Acción positiva
                   },
                 ),
               ],
@@ -128,8 +99,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
   // Método para manejar el evento de retroceso
   Future<bool> _onWillPop() async {
-    // Muestra el cuadro de diálogo de confirmación
-    bool confirmExit = await _mostrarDialogoConfirmacion(context);
+    // Mostrar el cuadro de diálogo para confirmar salida
+    bool confirmExit = await _mostrarDialogoConfirmacion(
+        context,
+        'Confirmar salida',
+        '¿Estás seguro de que deseas salir de la aplicación?');
 
     // Si el usuario confirma la salida, se cierra la aplicación
     if (confirmExit) {
@@ -409,10 +383,12 @@ class _PantallaInicialState extends State<PantallaInicial> {
                                             icon: const Icon(Icons.delete,
                                                 color: Colors.black),
                                             onPressed: () async {
-                                              // Mostrar el cuadro de diálogo de confirmación para eliminar el pedido
+                                              // Mostrar el cuadro de diálogo para confirmar eliminación
                                               bool confirmDelete =
-                                                  await _mostrarDialogoConfirmacionEliminar(
-                                                      context);
+                                                  await _mostrarDialogoConfirmacion(
+                                                      context,
+                                                      'Eliminar Pedido',
+                                                      '¿Estás seguro de que deseas eliminar este pedido?');
                                               if (confirmDelete) {
                                                 try {
                                                   await _daoPedidos
