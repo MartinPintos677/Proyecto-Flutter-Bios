@@ -21,6 +21,8 @@ class PantallaAgregarPedido extends StatefulWidget {
 class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
   final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
 
+  final _daoPedidos = DaoPedidos();
+
   Pedido? _pedido;
   int? _idPedido;
   DateTime _fechaHoraRealizacion = DateTime.now();
@@ -134,8 +136,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
 
   // Crear el pedido
   Future<void> _crearPedido() async {
-    final db = DaoPedidos();
-
+    
     // Obtener la cédula del cliente seleccionado
     final clienteCedula = _cedulaCliente;
 
@@ -151,13 +152,11 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
       lineasPedidos: _lineasPedido,
     );
     // Llamamos al método crearPedido del Dao
-    await db.crearPedido(pedido);
+    await _daoPedidos.crearPedido(pedido);
   }
 
   // Modificar el pedido
   Future<void> _modificarPedido() async {
-    final db = DaoPedidos();
-
     // Obtener la cédula del cliente seleccionado
     final clienteCedula = _cedulaCliente;
 
@@ -174,7 +173,7 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
     );
 
     // Guardar cambios en la base de datos
-    await db.modificarPedido(pedido);
+    await _daoPedidos.modificarPedido(pedido);
 
     // Mostrar un mensaje al usuario si corresponde
     if (_estadoEntrega == "Entregado" &&

@@ -11,6 +11,8 @@ class PantallaFichaCliente extends StatefulWidget {
 }
 
 class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
+  final _daoPedidos = DaoPedidos();
+  
   Cliente? cliente;
   List<Pedido> pedidos = [];
   double importeTotal = 0;
@@ -25,7 +27,7 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
 
   Future<void> _cargarPedidos() async {
     final _pedidos =
-        await DaoPedidos().obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
+        await _daoPedidos.obtenerPedidosNoCobradosPorCedula(cliente!.cedula);
 
     setState(() {
       pedidos = _pedidos;
@@ -151,7 +153,7 @@ class _PantallaFichaClienteState extends State<PantallaFichaCliente> {
               Center(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    DaoPedidos().actualizarEstadoCobradoPedido(pedidos);
+                    _daoPedidos.actualizarEstadoCobradoPedido(pedidos);
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

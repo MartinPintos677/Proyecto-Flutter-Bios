@@ -13,6 +13,8 @@ class PantallaAgregarCliente extends StatefulWidget {
 class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
   final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
 
+  final _daoClientes = DaoClientes();
+
   Cliente? _cliente;
   late String? _cedula;
   late String? _nombre;
@@ -233,8 +235,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
 
                           try {
                             // Verificar si ya existe un cliente con la misma cédula
-                            Cliente? clienteExistente = await DaoClientes()
-                                .getClienteByCedula(_cedula!);
+                            Cliente? clienteExistente = await _daoClientes.getClienteByCedula(_cedula!);
 
                             if (clienteExistente != null) {
                               // Si el cliente ya existe, mostrar mensaje de error
@@ -243,7 +244,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                               // Si no existe, proceder con la inserción o actualización
                               if (_cliente == null) {
                                 // Insertar cliente
-                                await DaoClientes().insertCliente(
+                                await _daoClientes.insertCliente(
                                   Cliente(
                                     cedula: _cedula!,
                                     nombre: _nombre!,
@@ -254,7 +255,7 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                                 mensaje = 'Cliente agregado con éxito';
                               } else {
                                 // Actualizar cliente
-                                await DaoClientes().updateCliente(
+                                await _daoClientes.updateCliente(
                                   Cliente(
                                     cedula: _cedula!,
                                     nombre: _nombre!,
