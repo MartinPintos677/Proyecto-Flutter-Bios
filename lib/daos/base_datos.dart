@@ -20,13 +20,13 @@ class BaseDatos {
     final String rutaArchivoBD = join(rutasDirectoriosBDs, "bios_lunch.sqlite");
 
     // **Elimina la base de datos existente para forzar la recreación**
-    await deleteDatabase(rutaArchivoBD);
+    //await deleteDatabase(rutaArchivoBD);
 
     _baseDeDatos = await openDatabase(
       rutaArchivoBD,
       version: 1,
       onCreate: (db, version) async {
-        print("Creando la base de datos...");
+        //print("Creando la base de datos...");
         await db.execute('''
           CREATE TABLE Cliente (
             cedula TEXT PRIMARY KEY, 
@@ -71,7 +71,7 @@ class BaseDatos {
           );
         ''');
 
-        print("Insertando datos de prueba...");
+        //print("Insertando datos de prueba...");
         await db.execute('''
           INSERT INTO Cliente (cedula, nombre, telefonoContacto, direccionEntrega)
           VALUES
@@ -135,11 +135,11 @@ class BaseDatos {
          (10, 5, 3),
          (10, 6, 2);
         ''');
-        print("Datos de prueba insertados.");
+        //print("Datos de prueba insertados.");
       },
       onOpen: (db) {
         db.execute('PRAGMA foreign_keys = ON;');
-        print("Base de datos abierta.");
+        //print("Base de datos abierta.");
       },
     );
 
