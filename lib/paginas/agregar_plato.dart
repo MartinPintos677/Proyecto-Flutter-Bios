@@ -13,6 +13,7 @@ class PantallaAgregarPlato extends StatefulWidget {
 
 class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
   final GlobalKey<FormState> _claveFormulario = GlobalKey<FormState>();
+  final daoPlato = DaoPlato();
 
   Plato? _plato;
   late String _nombre;
@@ -148,7 +149,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     );
 
     // Guardar o actualizar en la base de datos
-    final daoPlato = DaoPlato();
+    
     String mensaje;
     try {
       if (_plato == null) {
