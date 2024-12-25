@@ -136,7 +136,6 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
 
   // Crear el pedido
   Future<void> _crearPedido() async {
-    
     // Obtener la cédula del cliente seleccionado
     final clienteCedula = _cedulaCliente;
 
@@ -456,11 +455,16 @@ class _PantallaAgregarPedidoState extends State<PantallaAgregarPedido> {
                     ),
                     initialValue: _observaciones,
                     inputFormatters: [
-                      // Permite letras, números y espacios
+                      // Permitir letras, números, espacios y tildes
                       FilteringTextInputFormatter.allow(
-                          RegExp(r'[a-zA-Z0-9\s]')),
-                      // Deniega caracteres especiales como las comas (',')
-                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                        RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]'),
+                      ),
+                      // Denegar emojis, iconos y otros caracteres no deseados
+                      FilteringTextInputFormatter.deny(
+                        RegExp(
+                          r'[^\w\sáéíóúÁÉÍÓÚñÑ]', // No permite caracteres especiales distintos de tildes y letras
+                        ),
+                      ),
                     ],
                     onChanged: (value) {
                       setState(() {

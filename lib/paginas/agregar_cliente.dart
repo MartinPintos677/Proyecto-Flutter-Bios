@@ -144,11 +144,16 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     initialValue: _nombre,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [
-                      // Permite letras, números y espacios
+                      // Permitir letras, números, espacios y tildes
                       FilteringTextInputFormatter.allow(
-                          RegExp(r'[a-zA-Z0-9\s]')),
-                      // Deniega caracteres especiales como las comas (',')
-                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                        RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]'),
+                      ),
+                      // Denegar emojis, iconos y otros caracteres no deseados
+                      FilteringTextInputFormatter.deny(
+                        RegExp(
+                          r'[^\w\sáéíóúÁÉÍÓÚñÑ]', // No permite caracteres especiales distintos de tildes y letras
+                        ),
+                      ),
                     ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -178,11 +183,16 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
                     initialValue: _direccion,
                     textInputAction: TextInputAction.next,
                     inputFormatters: [
-                      // Permite letras, números y espacios
+                      // Permitir letras, números, espacios y tildes
                       FilteringTextInputFormatter.allow(
-                          RegExp(r'[a-zA-Z0-9\s]')),
-                      // Deniega caracteres especiales como las comas (',')
-                      FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                        RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]'),
+                      ),
+                      // Denegar emojis, iconos y otros caracteres no deseados
+                      FilteringTextInputFormatter.deny(
+                        RegExp(
+                          r'[^\w\sáéíóúÁÉÍÓÚñÑ]', // No permite caracteres especiales distintos de tildes y letras
+                        ),
+                      ),
                     ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -235,13 +245,14 @@ class _PantallaAgregarClienteState extends State<PantallaAgregarCliente> {
 
                           try {
                             // Verificar si ya existe un cliente con la misma cédula
-                            Cliente? clienteExistente = await _daoClientes.getClienteByCedula(_cedula!);
+                            Cliente? clienteExistente =
+                                await _daoClientes.getClienteByCedula(_cedula!);
 
-                            if (clienteExistente != null) {
-                              // Si el cliente ya existe, mostrar mensaje de error
+                            if (clienteExistente != null &&
+                                clienteExistente.cedula != _cliente?.cedula) {
+                              // Si existe otro cliente con la misma cédula, mostrar mensaje de error
                               mensaje = 'Ya existe un cliente con esa cédula';
                             } else {
-                              // Si no existe, proceder con la inserción o actualización
                               if (_cliente == null) {
                                 // Insertar cliente
                                 await _daoClientes.insertCliente(

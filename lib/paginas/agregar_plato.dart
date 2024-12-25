@@ -149,7 +149,7 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
     );
 
     // Guardar o actualizar en la base de datos
-    
+
     String mensaje;
     try {
       if (_plato == null) {
@@ -230,10 +230,16 @@ class _PantallaAgregarPlatoState extends State<PantallaAgregarPlato> {
                   cursorColor: Colors.green,
                   initialValue: _nombre,
                   inputFormatters: [
-                    // Permite letras, números y espacios
-                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9\s]')),
-                    // Deniega caracteres especiales como las comas (',')
-                    FilteringTextInputFormatter.deny(RegExp(r'[^\w\s]')),
+                    // Permitir letras, números, espacios y tildes
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]'),
+                    ),
+                    // Denegar emojis, iconos y otros caracteres no deseados
+                    FilteringTextInputFormatter.deny(
+                      RegExp(
+                        r'[^\w\sáéíóúÁÉÍÓÚñÑ]', // No permite caracteres especiales distintos de tildes y letras
+                      ),
+                    ),
                   ],
                   decoration: InputDecoration(
                     labelText: 'Nombre del Plato',
