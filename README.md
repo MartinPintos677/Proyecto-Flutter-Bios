@@ -50,4 +50,4 @@ La aplicación permite gestionar pedidos de clientes, administrar platos disponi
    flutter run
    ```
 ---
-© 2024 - **Martin Pintos - SOFTteam**
+¡Gracias por visitar este repositorio! 🎉
