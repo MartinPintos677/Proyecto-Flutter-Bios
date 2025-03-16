@@ -30,8 +30,8 @@ FUNCIONALIDADES PRINCIPALES
 4. INTERFAZ Y EXPERIENCIA DE USUARIO
 
     Uso de Material Design en Flutter.
-    Implementación de un menú lateral (Drawer) para navegar entre secciones.
-    Diseño responsivo para adaptarse a distintos tamaños de pantalla.
+    Implementación de un menú lateral (Drawer) para navegar entre secciones
+    Diseño responsivo para adaptarse a distintos tamaños de pantalla
     Uso de Snackbars y AlertDialogs para confirmaciones y notificaciones.
 
 5. PERSISTENCIA DE DATOS
